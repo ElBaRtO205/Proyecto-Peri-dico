@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\PostController;
+use App\Http\Controllers\NoticiaController;
 
-Route::resource('posts', PostController::class);
+Route::get('/', [NoticiaController::class, 'home']);
+Route::resource('noticia', NoticiaController::class);

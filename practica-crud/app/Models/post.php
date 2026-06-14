@@ -2,10 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-
-class post extends Model
+// Alias class to preserve any legacy references to Post/post
+class post extends noticia
 {
-    protected $fillable = ['title','content','autor_id','image_post'];
-    public const PAGINATE= 5;
 }
+

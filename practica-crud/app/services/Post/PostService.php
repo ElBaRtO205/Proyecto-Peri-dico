@@ -1,7 +1,7 @@
 <?php 
 
 namespace App\Services\Post;
-use App\Models\post as Post;
+use App\Models\noticia as Noticia;
 use \Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 
@@ -11,25 +11,26 @@ class PostService
 public function getall(): LengthAwarePaginator
 {
 
-$query = Post::query()->latest();
+$query = Noticia::query()->latest('fecha_publicacion');
 
-return $query->paginate(Post::PAGINATE);
+return $query->paginate(Noticia::PAGINATE);
 
 }
 
-public function find(int $id): Post
+public function find(int $id): Noticia
 {
-    return Post::findOrFail($id);
+    return Noticia::findOrFail($id);
 }
-public function create(array $data): Post
+public function create(array $data): Noticia
     {
-        $data['autor_id'] ??= 'anonymous';
+        //$data['id_autor'] ??= 'anonymous';
 
-        return Post::create($data);
+       //dd($data);
+        return Noticia::create($data);
     }
 public function update(int $id, array $data): bool
     {
-        $post = Post::findOrFail($id);
+        $post = Noticia::findOrFail($id);
         $post->fill($data);
 
         return $post->save();
@@ -37,7 +38,7 @@ public function update(int $id, array $data): bool
 
 public function delete(int $id): bool
     {
-        $post = Post::findOrFail($id);
+        $post = Noticia::findOrFail($id);
 
         return $post->delete();
     }

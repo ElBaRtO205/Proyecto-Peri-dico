@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 07-06-2026 a las 02:46:23
+-- Tiempo de generación: 15-06-2026 a las 00:10:11
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -20,18 +20,13 @@ SET time_zone = "+00:00";
 --
 -- Base de datos: `umc_news`
 --
-CREATE DATABASE IF NOT EXISTS `umc_news` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE `umc_news`;
 
 -- --------------------------------------------------------
 
 --
 -- Estructura de tabla para la tabla `autores`
 --
--- Creación: 06-06-2026 a las 23:40:11
---
 
-DROP TABLE IF EXISTS `autores`;
 CREATE TABLE `autores` (
   `id_autor` int(11) NOT NULL,
   `nombre` varchar(150) NOT NULL,
@@ -43,45 +38,56 @@ CREATE TABLE `autores` (
 --
 -- Estructura de tabla para la tabla `categorias`
 --
--- Creación: 06-06-2026 a las 23:40:10
---
 
-DROP TABLE IF EXISTS `categorias`;
 CREATE TABLE `categorias` (
   `id_categoria` int(11) NOT NULL,
   `nombre` varchar(100) NOT NULL,
   `descripcion` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Volcado de datos para la tabla `categorias`
+--
+
+INSERT INTO `categorias` (`id_categoria`, `nombre`, `descripcion`) VALUES
+(1, 'deporte', 'puro deporte'),
+(2, 'cultura', 'pura cultura'),
+(3, 'ni mierda', 'pura ni mierda');
+
 -- --------------------------------------------------------
 
 --
 -- Estructura de tabla para la tabla `noticias`
 --
--- Creación: 06-06-2026 a las 23:40:11
---
 
-DROP TABLE IF EXISTS `noticias`;
 CREATE TABLE `noticias` (
   `id_noticia` int(11) NOT NULL,
   `id_categoria` int(11) NOT NULL,
-  `id_autor` int(11) NOT NULL,
+  `autor` varchar(255) DEFAULT NULL,
   `id_usuario_admin` int(11) DEFAULT NULL,
   `titulo` varchar(255) NOT NULL,
   `contenido` text NOT NULL,
-  `fecha_publicacion` date NOT NULL,
-  `es_principal` tinyint(1) DEFAULT 0
+  `imagen_noticia` varchar(255) DEFAULT NULL,
+  `fecha_publicacion` date NOT NULL DEFAULT curdate(),
+  `es_principal` tinyint(1) DEFAULT 0,
+  `status` varchar(255) DEFAULT 'borrador'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Volcado de datos para la tabla `noticias`
+--
+
+INSERT INTO `noticias` (`id_noticia`, `id_categoria`, `autor`, `id_usuario_admin`, `titulo`, `contenido`, `imagen_noticia`, `fecha_publicacion`, `es_principal`, `status`) VALUES
+(3, 3, 'elwebolargo', NULL, 'sera este el fin', 'del hombre araña', 'C:\\xampp\\tmp\\phpA4B.tmp', '2026-06-14', 0, 'borrador'),
+(4, 3, 'lopez', NULL, 'ahora si deberia', 'tal vez', NULL, '2026-06-14', 0, 'publicado'),
+(5, 1, 'pitudo96', NULL, 'este es un borrador', 'ojala', NULL, '2026-06-14', 0, 'borrador');
 
 -- --------------------------------------------------------
 
 --
 -- Estructura de tabla para la tabla `usuarios`
 --
--- Creación: 07-06-2026 a las 00:39:52
---
 
-DROP TABLE IF EXISTS `usuarios`;
 CREATE TABLE `usuarios` (
   `id_usuario` int(11) NOT NULL,
   `nombre_completo` varchar(150) NOT NULL,
@@ -116,7 +122,6 @@ ALTER TABLE `categorias`
 ALTER TABLE `noticias`
   ADD PRIMARY KEY (`id_noticia`),
   ADD KEY `id_categoria` (`id_categoria`),
-  ADD KEY `id_autor` (`id_autor`),
   ADD KEY `fk_noticias_usuarios` (`id_usuario_admin`);
 
 --
@@ -141,13 +146,13 @@ ALTER TABLE `autores`
 -- AUTO_INCREMENT de la tabla `categorias`
 --
 ALTER TABLE `categorias`
-  MODIFY `id_categoria` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_categoria` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT de la tabla `noticias`
 --
 ALTER TABLE `noticias`
-  MODIFY `id_noticia` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_noticia` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT de la tabla `usuarios`
@@ -164,8 +169,7 @@ ALTER TABLE `usuarios`
 --
 ALTER TABLE `noticias`
   ADD CONSTRAINT `fk_noticias_usuarios` FOREIGN KEY (`id_usuario_admin`) REFERENCES `usuarios` (`id_usuario`) ON DELETE SET NULL ON UPDATE CASCADE,
-  ADD CONSTRAINT `noticias_ibfk_1` FOREIGN KEY (`id_categoria`) REFERENCES `categorias` (`id_categoria`) ON UPDATE CASCADE,
-  ADD CONSTRAINT `noticias_ibfk_2` FOREIGN KEY (`id_autor`) REFERENCES `autores` (`id_autor`) ON UPDATE CASCADE;
+  ADD CONSTRAINT `noticias_ibfk_1` FOREIGN KEY (`id_categoria`) REFERENCES `categorias` (`id_categoria`) ON UPDATE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

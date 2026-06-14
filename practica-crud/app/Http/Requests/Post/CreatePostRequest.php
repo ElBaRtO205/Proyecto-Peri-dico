@@ -23,10 +23,12 @@ class CreatePostRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => 'required|string|max:255',
-        'content' => 'required|string',
-        'autor_id' => 'nullable|string',
-        'imagen' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'titulo' => 'required|string|max:255',
+        'contenido' => 'required|string',
+        'autor' => 'required|string',
+        'imagen_noticia' => 'image|mimes:jpeg,png,jpg,webp|max:2048',
+        'id_categoria' => 'required|exists:categorias,id_categoria',
+        'status' => 'required|in:publicado,borrador',
         ];
     }
 }
