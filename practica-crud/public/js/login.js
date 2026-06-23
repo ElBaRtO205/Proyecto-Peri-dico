@@ -59,10 +59,11 @@ if (movilRegister) {
     });
 }
 
-// Prevenir envío de formularios (por ahora es demo)
+/* Prevenir envío de formularios (por ahora es demo)
 document.querySelectorAll('.autenticacion__formulario').forEach(form => {
     form.addEventListener('submit', (e) => {
         e.preventDefault();
         alert('Formulario enviado (simulación)');
     });
 });
+*/
