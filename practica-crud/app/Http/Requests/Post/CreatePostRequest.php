@@ -29,6 +29,7 @@ class CreatePostRequest extends FormRequest
         'imagen_noticia' => 'image|mimes:jpeg,png,jpg,webp|max:2048',
         'id_categoria' => 'required|exists:categorias,id_categoria',
         'status' => 'required|in:publicado,borrador',
+        'es_principal' => 'nullable|boolean',
         ];
     }
 }

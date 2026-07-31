@@ -1,38 +1,26 @@
 <?php
-use App\Http\Controllers\LoginController;
-use App\Http\Controllers\UsuarioController;
+
+use App\Http\Controllers\ComentarioController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\LoginController;
 use App\Http\Controllers\NoticiaController;
+use App\Http\Controllers\UsuarioController;
 
-Route::get('/', [NoticiaController::class, 'home']);
-Route::resource('noticia', NoticiaController::class);
+// --- RUTAS PÚBLICAS ---
+Route::get('/', [NoticiaController::class, 'home'])->name('home');
+Route::get('/categoria/{id}', [NoticiaController::class, 'categoria'])->name('noticia.categoria');
+Route::get('/noticia/{id}', [NoticiaController::class, 'show'])->name('noticia.show')->whereNumber('id');
 
-
-//  Ruta para mostrar la vista del formulario (Peticion GET)
+// --- AUTENTICACIÓN ---
 Route::get('/login', function () {
-    return view('login'); // la vista pa inciar sesion 
-})->name('login');
-
-// Ruta para procesar los datos que envia el formulario (Petición POST)
-Route::post('/login', [LoginController::class, 'login']);
-
-//  Ruta para cerrar sesion (por post)
-Route::post('/logout', function () {
-    request()->session()->invalidate();
-    request()->session()->regenerateToken();
-    return redirect('/');
-})->name('logout');
-
-
-// parte del login para la redireccion al panel de noticias
-Route::get('/login', function () {
-    return view('login');
+    return view('auth.login');
 })->name('login');
 
 Route::post('/login', [LoginController::class, 'login']);
-
-// el panel de crud de noticias 
-Route::resource('noticia', NoticiaController::class);
-
-//para el boton de salir de modo admin en la vista del crud
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+
+// --- PANEL DE ADMINISTRACIÓN (CRUD) ---
+Route::resource('noticia', NoticiaController::class)->names('admin.noticias')->except(['show']);
+
+// --- Comentarios De Las Noticias ---
+Route::post('/noticia/{id}/comentario', [ComentarioController::class, 'store'])->name('comentarios.store');

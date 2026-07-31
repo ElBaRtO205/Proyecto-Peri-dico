@@ -1,581 +1,159 @@
-<!DOCTYPE html>
-<html lang="es">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description"
-        content="UMC News — Periódico oficial de la Universidad Marítima del Caribe. Noticias de deportes, cultura, académico y rumores del campus." />
-    <title>UMC News</title>
-    <link rel="stylesheet" href="{{ asset('css/estilos.css') }}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-</head>
-
-<body>
-    <!-- Para accesibilidad, permite saltar al contenido -->
-    <a class="skip-link" href="#contenido-principal">Saltar al contenido principal</a>
-
-    <!-- Barra de arriba con fecha y enlaces rápidos -->
-    <div class="barra-superior">
-        <time class="barra-superior__fecha" datetime="2026-05-24">
-            <i class="fas fa-calendar-days"></i> Domingo, 24 de mayo de 2026
-        </time>
-
-        <div class="barra-superior__acciones">
-            <ul class="barra-superior__lista">
-                <li class="barra-superior__item">
-                    <a class="barra-superior__enlace" href="#">
-                        <i class="fas fa-envelope"></i> Contacto
-                    </a>
-                </li>
-                <li class="barra-superior__item">
-                    <a class="barra-superior__enlace" href="#">
-                        <i class="fas fa-microphone-lines"></i> Podcast
-                    </a>
-                </li>
-                <li class="barra-superior__item">
-                    <button class="barra-superior__btn-admin" type="button">
-                        <i class="fas fa-gear"></i> Admin
-                    </button>
-
-                    <li class="barra-superior__item">
-                        <a href="{{ route('login') }}" class="encabezado__enlace">
-                    <i class="fas fa-right-to-bracket"></i> Iniciar Sesión
-                </a>
-                </li>
-            </ul>
-        </div>
-    </div>
-
-    <!-- Header con logo y navegación -->
-    <header class="encabezado">
-        <div class="encabezado__contenido">
-            <h1 class="encabezado__titulo">
-                <span class="encabezado__titulo-acento">UMC</span> News
-            </h1>
-            <p class="encabezado__subtitulo">Periódico Oficial de la Universidad Marítima del Caribe</p>
-        </div>
-
-        <!-- Barra de búsqueda, se abre con el botón de lupa -->
-        <div class="encabezado__busqueda">
-            <input type="search" class="encabezado__input-buscar" placeholder="Buscar noticias...">
-            <button class="encabezado__btn-cerrar-buscar" type="button" aria-label="Cerrar búsqueda">✕</button>
-        </div>
-
-        <nav class="encabezado__nav" aria-label="Navegación principal">
-            <ul class="encabezado__lista">
-                <li class="encabezado__item"><a class="encabezado__enlace" href="#">Cultura</a></li>
-                <li class="encabezado__item"><a class="encabezado__enlace" href="#">Deportes</a></li>
-                <li class="encabezado__item"><a class="encabezado__enlace" href="#">Académico &amp; Proyectos</a></li>
-                <li class="encabezado__item"><a class="encabezado__enlace" href="#">Rumores del Campus</a></li>
-                <li class="encabezado__item">
-                    <button class="encabezado__btn-buscar" type="button" aria-label="Buscar">
-                        <i class="fas fa-search"></i>
-                    </button>
-                </li>
-            </ul>
-        </nav>
-    </header>
-
-    <!-- Video de fondo con capa blanca encima para que se lea el texto -->
-    <div class="fondo-video-global">
-        <video autoplay muted loop playsinline>
-            <source src="videos/oceano.mp4" type="video/mp4">
-        </video>
-        <div class="capa-blanca"></div>
-    </div>
-
-    <main class="contenido-principal" id="contenido-principal">
+<x-app-layout>
+    <x-slot:title>UMC News | Portada Principal</x-slot:title>
+        
         <!-- Noticia principal destacada -->
         <section class="hero">
             <h2 class="hero__titulo">Noticia principal</h2>
-
-            <!-- Lo que ve el usuario normalmente -->
+            
+            @if($noticiaPrincipal)
             <div class="hero__vista-previa">
                 <article class="hero__articulo">
-                    <img class="hero__imagen" src="img/noticia destacada/noticias-destacadas.jpg" alt="Periódicos" loading="lazy">
-                    <h3 class="hero__subtitulo">Noticia destacada</h3>
-                    <p class="hero__autor">nombre de autor</p>
-                    <time class="hero__fecha" datetime="2026-05-22">22 de mayo de 2026</time>
-                    <p class="hero__texto">Lorem ipsum dolor sit amet consectetur adipisicing elit. Tenetur, quia reprehenderit ad unde praesentium accusamus magnam sunt quod distinctio rem, illo natus perferendis accusantium, animi soluta! Assumenda incidunt quo totam!</p>
+                    <a href="{{ route('noticia.show', $noticiaPrincipal->id_noticia) }}" style="text-decoration: none; color: inherit; display: block;">
+                        @if($noticiaPrincipal->imagen_noticia)
+                            <img class="hero__imagen" src="{{ asset('storage/' . $noticiaPrincipal->imagen_noticia) }}" alt="{{ $noticiaPrincipal->titulo }}" loading="lazy">
+                        @else
+                            <img class="hero__imagen" src="{{ asset('img/noticia destacada/noticias-destacadas.jpg') }}" alt="Imagen por defecto" loading="lazy">
+                        @endif
+                        
+                        <h3 class="hero__subtitulo">{{ $noticiaPrincipal->titulo }}</h3>
+                        <p class="hero__autor">{{ $noticiaPrincipal->autor->nombre ?? 'Redacción UMC' }}</p>
+                        <time class="hero__fecha" datetime="{{ $noticiaPrincipal->fecha_publicacion->format('Y-m-d') }}">{{ $noticiaPrincipal->fecha_publicacion->format('d \d\e F \d\e Y') }}</time>
+                        <p class="hero__texto">{{ Str::limit($noticiaPrincipal->texto ?? $noticiaPrincipal->contenido, 250) }}</p>
+                    </a>
                 </article>
             </div>
-
-            <!-- Formulario que aparece en modo admin -->
-            <form class="hero__formulario" action="#" method="post" enctype="multipart/form-data">
-                <div class="formulario__campo">
-                    <label class="formulario__label" for="hero-imagen">Imagen Principal</label>
-                    <img class="hero__imagen" src="img/marcos/marco_para_imganes_horizontal.png" alt="Vista previa" id="preview-hero-imagen" style="max-height: 300px; margin-bottom: 10px; border-radius: 6px;">
-                    <input type="file" id="hero-imagen" name="imagen" class="formulario__input-file" accept="image/*">
-                    <button type="button" class="formulario__btn-cambiar" onclick="document.getElementById('hero-imagen').click()">Cambiar imagen</button>
-                </div>
-
-                <div class="formulario__campo">
-                    <label class="formulario__label" for="hero-titulo">Título Principal</label>
-                    <input type="text" id="hero-titulo" name="titulo" class="formulario__input formulario__input--titulo" value="Noticia destacada" required>
-                </div>
-
-                <div class="formulario__campo">
-                    <label class="formulario__label" for="hero-autor">Autor</label>
-                    <input type="text" id="hero-autor" name="autor" class="formulario__input" value="nombre de autor">
-                </div>
-
-                <div class="formulario__campo">
-                    <label class="formulario__label" for="hero-fecha">Fecha</label>
-                    <input type="date" id="hero-fecha" name="fecha" class="formulario__input" value="2026-05-22" required>
-                </div>
-
-                <div class="formulario__campo">
-                    <label class="formulario__label" for="hero-texto">Texto Completo</label>
-                    <textarea id="hero-texto" name="texto" class="formulario__textarea" rows="6" required>Lorem ipsum dolor sit amet consectetur adipisicing elit. Tenetur, quia reprehenderit ad unde praesentium accusamus magnam sunt quod distinctio rem, illo natus perferendis accusantium, animi soluta! Assumenda incidunt quo totam!</textarea>
-                </div>
-
-                <div class="formulario__acciones">
-                    <button type="submit" class="formulario__btn formulario__btn--guardar">💾 Guardar Cambios</button>
-                    <button type="button" class="formulario__btn formulario__btn--cancelar" onclick="desactivarModoAdminHero()">❌ Cancelar</button>
-                </div>
-            </form>
+            @else
+            <p style="text-align: center; padding: 2rem;">No hay noticias publicadas aún.</p>
+            @endif
         </section>
 
-        <!-- Sección de deportes -->
+        <!-- ==================== SECCION: PODCAST ==================== -->
+        <section class="seccion-video" id="videoSection">
+            <h2 class="seccion-video__titulo"><i class="fab fa-youtube"></i> Podcast Institucional UMC</h2>
+            
+            <div class="video-bloque-wrapper">
+                <div class="video-bloque" id="videoPlayerContainer">  */ se cambia el "watch" del link por "embed", https://www.youtube.com/watch?v=-C3b15ldP9s*/
+                    <iframe 
+                        src="https://www.youtube.com/embed/JtYxFsbSeaQ" 
+                        title="Podcast UMC" 
+                        frameborder="0" 
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                        allowfullscreen>
+                    </iframe>
+                    <button class="pip-close-btn-yt" id="closeFloatingBtn" title="Cerrar">✕</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Seccion de deportes -->
         <section class="grilla-noticias">
             <h2 class="grilla-noticias__titulo">Deportes</h2>
             
-            <!-- Tarjeta 1 -->
+            @forelse($noticias->where('categoria.nombre', 'deporte')->take(2) as $noticia)
             <article class="tarjeta-noticia">
-                <div class="tarjeta-noticia__vista-previa">
-                    <img class="tarjeta-noticia__imagen" src="img/deportes/deportes.jpg" alt="gente entrenando" loading="lazy">
-                    <h3 class="tarjeta-noticia__titulo">titulo de la noticia</h3>
-                    <p class="tarjeta-noticia__texto">Lorem ipsum dolor sit amet consectetur adipisicing elit. Tenetur, quia reprehenderit ad unde praesentium accusamus magnam sunt quod distinctio rem, illo natus perferendis accusantium, animi soluta! Assumenda incidunt quo totam!</p>
-                    <p class="tarjeta-noticia__autor">nombre de autor</p>
-                    <time class="tarjeta-noticia__fecha" datetime="2026-05-22">22 de mayo de 2026</time>
-                </div>
-
-                <form class="tarjeta-noticia__formulario" action="#" method="post">
-                    <div class="formulario__campo">
-                        <label class="formulario__label" for="imagen-1">Imagen</label>
-                        <img class="tarjeta-noticia__imagen" src="img/marcos/marco_para_imganes_horizontal.png" alt="marco para imágenes" id="preview-imagen-1">
-                        <input type="file" id="imagen-1" name="imagen" class="formulario__input-file" accept="image/*">
-                        <button type="button" class="formulario__btn-cambiar" onclick="document.getElementById('imagen-1').click()">Cambiar imagen</button>
-                    </div>
-
-                    <div class="formulario__campo">
-                        <label class="formulario__label" for="titulo-1">Título</label>
-                        <input type="text" id="titulo-1" name="titulo" class="formulario__input formulario__input--titulo" value="titulo de la noticia" required>
-                    </div>
-                    <div class="formulario__campo">
-                        <label class="formulario__label" for="texto-1">Texto</label>
-                        <textarea id="texto-1" name="texto" class="formulario__textarea" rows="4" required>Lorem ipsum...</textarea>
-                    </div>
-                    <div class="formulario__campo">
-                        <label class="formulario__label" for="autor-1">Autor</label>
-                        <input type="text" id="autor-1" name="autor" class="formulario__input" value="nombre de autor">
-                    </div>
-                    <div class="formulario__campo">
-                        <label class="formulario__label" for="fecha-1">Fecha</label>
-                        <input type="date" id="fecha-1" name="fecha" class="formulario__input" value="2026-05-22" required>
-                    </div>
-                    <div class="formulario__acciones">
-                        <button type="submit" class="formulario__btn formulario__btn--guardar">💾 Guardar</button>
-                        <button type="button" class="formulario__btn formulario__btn--cancelar">❌ Cancelar</button>
-                        <button type="button" class="formulario__btn formulario__btn--eliminar">️ Eliminar</button>
-                    </div>
-                </form>
+                <a href="{{ route('noticia.show', $noticia->id_noticia) }}" class="tarjeta-noticia__vista-previa">
+                    <img class="tarjeta-noticia__imagen" src="{{ $noticia->imagen_noticia ? asset('storage/' . $noticia->imagen_noticia) : asset('img/deportes/deportes.jpg') }}" alt="{{ $noticia->titulo }}" loading="lazy">
+                    <h3 class="tarjeta-noticia__titulo">{{ $noticia->titulo }}</h3>
+                    <p class="tarjeta-noticia__texto">{{ Str::limit($noticia->texto ?? $noticia->contenido, 150) }}</p>
+                    <p class="tarjeta-noticia__autor">{{ $noticia->autor->nombre ?? 'Redacción' }}</p>
+                    <time class="tarjeta-noticia__fecha" datetime="{{ $noticia->fecha_publicacion->format('Y-m-d') }}">{{ $noticia->fecha_publicacion->format('d/m/Y') }}</time>
+                </a>
             </article>
-
-            <!-- Tarjeta 2 -->
-            <article class="tarjeta-noticia">
-                <div class="tarjeta-noticia__vista-previa">
-                    <img class="tarjeta-noticia__imagen" src="img/deportes/futbol.jpg" alt="estadio de futbol" loading="lazy">
-                    <h3 class="tarjeta-noticia__titulo">titulo de la noticia</h3>
-                    <p class="tarjeta-noticia__texto">Lorem ipsum dolor sit amet consectetur adipisicing elit. Tenetur, quia reprehenderit ad unde praesentium accusamus magnam sunt quod distinctio rem, illo natus perferendis accusantium, animi soluta! Assumenda incidunt quo totam!</p>
-                    <p class="tarjeta-noticia__autor">nombre de autor</p>
-                    <time class="tarjeta-noticia__fecha" datetime="2026-05-22">22 de mayo de 2026</time>
-                </div>
-
-                <form class="tarjeta-noticia__formulario" action="#" method="post">
-                    <div class="formulario__campo">
-                        <label class="formulario__label" for="imagen-2">Imagen</label>
-                        <img class="tarjeta-noticia__imagen" src="img/marcos/marco_para_imganes_horizontal.png" alt="marco para imágenes" id="preview-imagen-2">
-                        <input type="file" id="imagen-2" name="imagen" class="formulario__input-file" accept="image/*">
-                        <button type="button" class="formulario__btn-cambiar" onclick="document.getElementById('imagen-2').click()">Cambiar imagen</button>
-                    </div>
-                    <div class="formulario__campo">
-                        <label class="formulario__label" for="titulo-2">Título</label>
-                        <input type="text" id="titulo-2" name="titulo" class="formulario__input formulario__input--titulo" value="titulo de la noticia" required>
-                    </div>
-                    <div class="formulario__campo">
-                        <label class="formulario__label" for="texto-2">Texto</label>
-                        <textarea id="texto-2" name="texto" class="formulario__textarea" rows="4" required>Lorem ipsum...</textarea>
-                    </div>
-                    <div class="formulario__campo">
-                        <label class="formulario__label" for="autor-2">Autor</label>
-                        <input type="text" id="autor-2" name="autor" class="formulario__input" value="nombre de autor">
-                    </div>
-                    <div class="formulario__campo">
-                        <label class="formulario__label" for="fecha-2">Fecha</label>
-                        <input type="date" id="fecha-2" name="fecha" class="formulario__input" value="2026-05-22" required>
-                    </div>
-                    <div class="formulario__acciones">
-                        <button type="submit" class="formulario__btn formulario__btn--guardar">💾 Guardar</button>
-                        <button type="button" class="formulario__btn formulario__btn--cancelar">❌ Cancelar</button>
-                        <button type="button" class="formulario__btn formulario__btn--eliminar">️ Eliminar</button>
-                    </div>
-                </form>
-            </article>
+            @empty
+                <p>Pronto nuevas noticias de deportes.</p>
+            @endforelse
             
             <div class="grilla-noticias__ver-mas">
-                <a href="#" class="grilla-noticias__enlace-mas">
+                @php
+                    $idDeporte = $noticias->where('categoria.nombre', 'deporte')->first()?->id_categoria;
+                @endphp
+                <a href="{{ $idDeporte ? route('noticia.categoria', $idDeporte) : '#' }}" class="grilla-noticias__enlace-mas">
                     Ver más noticias de Deportes
                 </a>
             </div>
         </section>
 
-        <!-- Sección de cultura -->
+        <!-- Seccion de cultura -->
         <section class="grilla-noticias">
             <h2 class="grilla-noticias__titulo">Cultura</h2>
+            
+            @forelse($noticias->where('categoria.nombre', 'cultura')->take(2) as $noticia)
             <article class="tarjeta-noticia">
-                <div class="tarjeta-noticia__vista-previa">
-                    <img class="tarjeta-noticia__imagen" src="img/cultura/venezuela-arte.jpg" alt="venezuela" loading="lazy">
-                    <h3 class="tarjeta-noticia__titulo">titulo de la noticia</h3>
-                    <p class="tarjeta-noticia__texto">Lorem ipsum dolor sit amet consectetur adipisicing elit. Tenetur, quia reprehenderit ad unde praesentium accusamus magnam sunt quod distinctio rem, illo natus perferendis accusantium, animi soluta! Assumenda incidunt quo totam!</p>
-                    <p class="tarjeta-noticia__autor">nombre de autor</p>
-                    <time class="tarjeta-noticia__fecha" datetime="2026-05-22">22 de mayo de 2026</time>
-                </div>
-                <form class="tarjeta-noticia__formulario" action="#" method="post">
-                    <div class="formulario__campo">
-                        <label class="formulario__label" for="imagen-3">Imagen</label>
-                        <img class="tarjeta-noticia__imagen" src="img/marcos/marco_para_imganes_horizontal.png" alt="marco para imágenes" id="preview-imagen-3">
-                        <input type="file" id="imagen-3" name="imagen" class="formulario__input-file" accept="image/*">
-                        <button type="button" class="formulario__btn-cambiar" onclick="document.getElementById('imagen-3').click()">Cambiar imagen</button>
-                    </div>
-                    <div class="formulario__campo">
-                        <label class="formulario__label" for="titulo-3">Título</label>
-                        <input type="text" id="titulo-3" name="titulo" class="formulario__input formulario__input--titulo" value="titulo de la noticia" required>
-                    </div>
-                    <div class="formulario__campo">
-                        <label class="formulario__label" for="texto-3">Texto</label>
-                        <textarea id="texto-3" name="texto" class="formulario__textarea" rows="4" required>Lorem ipsum...</textarea>
-                    </div>
-                    <div class="formulario__campo">
-                        <label class="formulario__label" for="autor-3">Autor</label>
-                        <input type="text" id="autor-3" name="autor" class="formulario__input" value="nombre de autor">
-                    </div>
-                    <div class="formulario__campo">
-                        <label class="formulario__label" for="fecha-3">Fecha</label>
-                        <input type="date" id="fecha-3" name="fecha" class="formulario__input" value="2026-05-22" required>
-                    </div>
-                    </div>
-                    <div class="formulario__acciones">
-                        <button type="submit" class="formulario__btn formulario__btn--guardar">💾 Guardar</button>
-                        <button type="button" class="formulario__btn formulario__btn--cancelar">❌ Cancelar</button>
-                        <button type="button" class="formulario__btn formulario__btn--eliminar">️ Eliminar</button>
-                    </div>
-                </form>
+                <a href="{{ route('noticia.show', $noticia->id_noticia) }}" class="tarjeta-noticia__vista-previa">
+                    <img class="tarjeta-noticia__imagen" src="{{ $noticia->imagen_noticia ? asset('storage/' . $noticia->imagen_noticia) : asset('img/cultura/venezuela-arte.jpg') }}" alt="{{ $noticia->titulo }}" loading="lazy">
+                    <h3 class="tarjeta-noticia__titulo">{{ $noticia->titulo }}</h3>
+                    <p class="tarjeta-noticia__texto">{{ Str::limit($noticia->texto ?? $noticia->contenido, 150) }}</p>
+                    <p class="tarjeta-noticia__autor">{{ $noticia->autor->nombre ?? 'Redacción' }}</p>
+                    <time class="tarjeta-noticia__fecha" datetime="{{ $noticia->fecha_publicacion->format('Y-m-d') }}">{{ $noticia->fecha_publicacion->format('d/m/Y') }}</time>
+                </a>
             </article>
-
-            <article class="tarjeta-noticia">
-                <div class="tarjeta-noticia__vista-previa">
-                    <img class="tarjeta-noticia__imagen" src="img/cultura/Caracas.jpg" alt="teatro" loading="lazy">
-                    <h3 class="tarjeta-noticia__titulo">titulo de la noticia</h3>
-                    <p class="tarjeta-noticia__texto">Lorem ipsum dolor sit amet consectetur adipisicing elit. Tenetur, quia reprehenderit ad unde praesentium accusamus magnam sunt quod distinctio rem, illo natus perferendis accusantium, animi soluta! Assumenda incidunt quo totam!</p>
-                    <p class="tarjeta-noticia__autor">nombre de autor</p>
-                    <time class="tarjeta-noticia__fecha" datetime="2026-05-22">22 de mayo de 2026</time>
-                </div>
-
-                <form class="tarjeta-noticia__formulario" action="#" method="post">
-                    <div class="formulario__campo">
-                        <label class="formulario__label" for="imagen-4">Imagen</label>
-                        <img class="tarjeta-noticia__imagen" src="img/marcos/marco_para_imganes_horizontal.png" alt="marco para imágenes" id="preview-imagen-4">
-                        <input type="file" id="imagen-4" name="imagen" class="formulario__input-file" accept="image/*">
-                        <button type="button" class="formulario__btn-cambiar" onclick="document.getElementById('imagen-4').click()">Cambiar imagen</button>
-                    </div>
-                    <div class="formulario__campo">
-                        <label class="formulario__label" for="titulo-4">Título</label>
-                        <input type="text" id="titulo-4" name="titulo" class="formulario__input formulario__input--titulo" value="titulo de la noticia" required>
-                    </div>
-                    <div class="formulario__campo">
-                        <label class="formulario__label" for="texto-4">Texto</label>
-                        <textarea id="texto-4" name="texto" class="formulario__textarea" rows="4" required>Lorem ipsum...</textarea>
-                    </div>
-                    <div class="formulario__campo">
-                        <label class="formulario__label" for="autor-4">Autor</label>
-                        <input type="text" id="autor-4" name="autor" class="formulario__input" value="nombre de autor">
-                    </div>
-                    <div class="formulario__campo">
-                        <label class="formulario__label" for="fecha-4">Fecha</label>
-                        <input type="date" id="fecha-4" name="fecha" class="formulario__input" value="2026-05-22" required>
-                    </div>
-                    <div class="formulario__acciones">
-                        <button type="submit" class="formulario__btn formulario__btn--guardar">💾 Guardar</button>
-                        <button type="button" class="formulario__btn formulario__btn--cancelar">❌ Cancelar</button>
-                        <button type="button" class="formulario__btn formulario__btn--eliminar">️ Eliminar</button>
-                    </div>
-                </form>
-            </article>
+            @empty
+                <p>Pronto nuevas noticias de Cultura.</p>
+            @endforelse
+            
             <div class="grilla-noticias__ver-mas">
-                <a href="#" class="grilla-noticias__enlace-mas">
+                @php
+                    $idCultura = $noticias->where('categoria.nombre', 'cultura')->first()?->id_categoria;
+                @endphp
+                <a href="{{ $idCultura ? route('noticia.categoria', $idCultura) : '#' }}" class="grilla-noticias__enlace-mas">
                     Ver más noticias de Cultura
                 </a>
             </div>
         </section>
 
-        <!-- Sección académico y proyectos -->
+        <!-- Seccion economia -->
         <section class="grilla-noticias">
-            <h2 class="grilla-noticias__titulo">Académico &amp; Proyectos</h2>
+            <h2 class="grilla-noticias__titulo">Economia</h2>
+            
+            @forelse($noticias->where('categoria.nombre', 'Economia')->take(4) as $noticia)
             <article class="tarjeta-noticia">
-                <div class="tarjeta-noticia__vista-previa">
-                    <img class="tarjeta-noticia__imagen" src="img/academico-proyectos/estudiantes.jpg" alt="proyecto académico" loading="lazy">
-                    <h3 class="tarjeta-noticia__titulo">titulo de la noticia</h3>
-                    <p class="tarjeta-noticia__texto">Lorem ipsum dolor sit amet consectetur adipisicing elit. Tenetur, quia reprehenderit ad unde praesentium accusamus magnam sunt quod distinctio rem, illo natus perferendis accusantium, animi soluta! Assumenda incidunt quo totam!</p>
-                    <p class="tarjeta-noticia__autor">nombre de autor</p>
-                    <time class="tarjeta-noticia__fecha" datetime="2026-05-22">22 de mayo de 2026</time>
-                </div>
-
-                <form class="tarjeta-noticia__formulario" action="#" method="post">
-                    <div class="formulario__campo">
-                        <label class="formulario__label" for="imagen-5">Imagen</label>
-                        <img class="tarjeta-noticia__imagen" src="img/marcos/marco_para_imganes_horizontal.png" alt="marco para imágenes" id="preview-imagen-5">
-                        <input type="file" id="imagen-5" name="imagen" class="formulario__input-file" accept="image/*">
-                        <button type="button" class="formulario__btn-cambiar" onclick="document.getElementById('imagen-5').click()">Cambiar imagen</button>
-                    </div>
-                    <div class="formulario__campo">
-                        <label class="formulario__label" for="titulo-5">Título</label>
-                        <input type="text" id="titulo-5" name="titulo" class="formulario__input formulario__input--titulo" value="titulo de la noticia" required>
-                    </div>
-                    <div class="formulario__campo">
-                        <label class="formulario__label" for="texto-5">Texto</label>
-                        <textarea id="texto-5" name="texto" class="formulario__textarea" rows="4" required>Lorem ipsum...</textarea>
-                    </div>
-                    <div class="formulario__campo">
-                        <label class="formulario__label" for="autor-5">Autor</label>
-                        <input type="text" id="autor-5" name="autor" class="formulario__input" value="nombre de autor">
-                    </div>
-                    <div class="formulario__campo">
-                        <label class="formulario__label" for="fecha-5">Fecha</label>
-                        <input type="date" id="fecha-5" name="fecha" class="formulario__input" value="2026-05-22" required>
-                    </div>
-                    <div class="formulario__acciones">
-                        <button type="submit" class="formulario__btn formulario__btn--guardar">💾 Guardar</button>
-                        <button type="button" class="formulario__btn formulario__btn--cancelar">❌ Cancelar</button>
-                        <button type="button" class="formulario__btn formulario__btn--eliminar">️ Eliminar</button>
-                    </div>
-                </form>
+                <a href="{{ route('noticia.show', $noticia->id_noticia) }}" class="tarjeta-noticia__vista-previa">
+                    <img class="tarjeta-noticia__imagen" src="{{ $noticia->imagen_noticia ? asset('storage/' . $noticia->imagen_noticia) : asset('img/Economia/estudiantes.jpg') }}" alt="{{ $noticia->titulo }}" loading="lazy">
+                    <h3 class="tarjeta-noticia__titulo">{{ $noticia->titulo }}</h3>
+                    <p class="tarjeta-noticia__texto">{{ Str::limit($noticia->texto ?? $noticia->contenido, 150) }}</p>
+                    <p class="tarjeta-noticia__autor">{{ $noticia->autor->nombre ?? 'Redacción' }}</p>
+                    <time class="tarjeta-noticia__fecha" datetime="{{ $noticia->fecha_publicacion->format('Y-m-d') }}">{{ $noticia->fecha_publicacion->format('d/m/Y') }}</time>
+                </a>
             </article>
-
-            <article class="tarjeta-noticia">
-                <div class="tarjeta-noticia__vista-previa">
-                    <img class="tarjeta-noticia__imagen" src="img/academico-proyectos/proyecto.jpg" alt="conferencia académica" loading="lazy">
-                    <h3 class="tarjeta-noticia__titulo">titulo de la noticia</h3>
-                    <p class="tarjeta-noticia__texto">Lorem ipsum dolor sit amet consectetur adipisicing elit. Tenetur, quia reprehenderit ad unde praesentium accusamus magnam sunt quod distinctio rem, illo natus perferendis accusantium, animi soluta! Assumenda incidunt quo totam!</p>
-                    <p class="tarjeta-noticia__autor">nombre de autor</p>
-                    <time class="tarjeta-noticia__fecha" datetime="2026-05-22">22 de mayo de 2026</time>
-                </div>
-
-                <form class="tarjeta-noticia__formulario" action="#" method="post">
-                    <div class="formulario__campo">
-                        <label class="formulario__label" for="imagen-6">Imagen</label>
-                        <img class="tarjeta-noticia__imagen" src="img/marcos/marco_para_imganes_horizontal.png" alt="marco para imágenes" id="preview-imagen-6">
-                        <input type="file" id="imagen-6" name="imagen" class="formulario__input-file" accept="image/*">
-                        <button type="button" class="formulario__btn-cambiar" onclick="document.getElementById('imagen-6').click()">Cambiar imagen</button>
-                    </div>
-                    <div class="formulario__campo">
-                        <label class="formulario__label" for="titulo-6">Título</label>
-                        <input type="text" id="titulo-6" name="titulo" class="formulario__input formulario__input--titulo" value="titulo de la noticia" required>
-                    </div>
-                    <div class="formulario__campo">
-                        <label class="formulario__label" for="texto-6">Texto</label>
-                        <textarea id="texto-6" name="texto" class="formulario__textarea" rows="4" required>Lorem ipsum...</textarea>
-                    </div>
-                    <div class="formulario__campo">
-                        <label class="formulario__label" for="autor-6">Autor</label>
-                        <input type="text" id="autor-6" name="autor" class="formulario__input" value="nombre de autor">
-                    </div>
-                    <div class="formulario__campo">
-                        <label class="formulario__label" for="fecha-6">Fecha</label>
-                        <input type="date" id="fecha-6" name="fecha" class="formulario__input" value="2026-05-22" required>
-                    </div>
-                    <div class="formulario__acciones">
-                        <button type="submit" class="formulario__btn formulario__btn--guardar">💾 Guardar</button>
-                        <button type="button" class="formulario__btn formulario__btn--cancelar">❌ Cancelar</button>
-                        <button type="button" class="formulario__btn formulario__btn--eliminar">️ Eliminar</button>
-                    </div>
-                </form>
-            </article>
+            @empty
+                <p>Pronto nuevas noticias de Economia.</p>
+            @endforelse
+            
             <div class="grilla-noticias__ver-mas">
-                <a href="#" class="grilla-noticias__enlace-mas">
-                    Ver más noticias de Académico &amp; Proyectos
+                @php
+                    $idEconomia = $noticias->where('categoria.nombre', 'Economia')->first()?->id_categoria;
+                @endphp
+                <a href="{{ $idEconomia ? route('noticia.categoria', $idEconomia) : '#' }}" class="grilla-noticias__enlace-mas">
+                    Ver más noticias de Economia
                 </a>
             </div>
         </section>
 
-        <!-- Sección rumores del campus -->
+        <!-- Seccion rumores del campus -->
         <section class="grilla-noticias">
             <h2 class="grilla-noticias__titulo">Rumores del Campus</h2>
+            
+            @forelse($noticias->where('categoria.nombre', 'rumores')->take(2) as $noticia)
             <article class="tarjeta-noticia">
-                <div class="tarjeta-noticia__vista-previa">
-                    <img class="tarjeta-noticia__imagen" src="img/campus/campus.jpg" alt="estudiantes hablando" loading="lazy">
-                    <h3 class="tarjeta-noticia__titulo">titulo de la noticia</h3>
-                    <p class="tarjeta-noticia__texto">Lorem ipsum dolor sit amet consectetur adipisicing elit. Tenetur, quia reprehenderit ad unde praesentium accusamus magnam sunt quod distinctio rem, illo natus perferendis accusantium, animi soluta! Assumenda incidunt quo totam!</p>
-                    <p class="tarjeta-noticia__autor">nombre de autor</p>
-                    <time class="tarjeta-noticia__fecha" datetime="2026-05-22">22 de mayo de 2026</time>
-                </div>
-
-                <form class="tarjeta-noticia__formulario" action="#" method="post">
-                    <div class="formulario__campo">
-                        <label class="formulario__label" for="imagen-7">Imagen</label>
-                        <img class="tarjeta-noticia__imagen" src="img/marcos/marco_para_imganes_horizontal.png" alt="marco para imágenes" id="preview-imagen-7">
-                        <input type="file" id="imagen-7" name="imagen" class="formulario__input-file" accept="image/*">
-                        <button type="button" class="formulario__btn-cambiar" onclick="document.getElementById('imagen-7').click()">Cambiar imagen</button>
-                    </div>
-                    <div class="formulario__campo">
-                        <label class="formulario__label" for="titulo-7">Título</label>
-                        <input type="text" id="titulo-7" name="titulo" class="formulario__input formulario__input--titulo" value="titulo de la noticia" required>
-                    </div>
-                    <div class="formulario__campo">
-                        <label class="formulario__label" for="texto-7">Texto</label>
-                        <textarea id="texto-7" name="texto" class="formulario__textarea" rows="4" required>Lorem ipsum...</textarea>
-                    </div>
-                    <div class="formulario__campo">
-                        <label class="formulario__label" for="autor-7">Autor</label>
-                        <input type="text" id="autor-7" name="autor" class="formulario__input" value="nombre de autor">
-                    </div>
-                    <div class="formulario__campo">
-                        <label class="formulario__label" for="fecha-7">Fecha</label>
-                        <input type="date" id="fecha-7" name="fecha" class="formulario__input" value="2026-05-22" required>
-                    </div>
-                    <div class="formulario__acciones">
-                        <button type="submit" class="formulario__btn formulario__btn--guardar">💾 Guardar</button>
-                        <button type="button" class="formulario__btn formulario__btn--cancelar">❌ Cancelar</button>
-                        <button type="button" class="formulario__btn formulario__btn--eliminar">️ Eliminar</button>
-                    </div>
-                </form>
+                <a href="{{ route('noticia.show', $noticia->id_noticia) }}" class="tarjeta-noticia__vista-previa">
+                    <img class="tarjeta-noticia__imagen" src="{{ asset('storage/' . $noticia->imagen_noticia) }}" alt="{{ $noticia->titulo }}" loading="lazy">
+                    <h3 class="tarjeta-noticia__titulo">{{ $noticia->titulo }}</h3>
+                    <p class="tarjeta-noticia__texto">{{ Str::limit($noticia->texto ?? $noticia->contenido, 150) }}</p>
+                    <p class="tarjeta-noticia__autor">{{ $noticia->autor->nombre ?? 'Redacción' }}</p>
+                    <time class="tarjeta-noticia__fecha" datetime="{{ $noticia->fecha_publicacion->format('Y-m-d') }}">{{ $noticia->fecha_publicacion->format('d/m/Y') }}</time>
+                </a>
             </article>
-
-            <article class="tarjeta-noticia">
-                <div class="tarjeta-noticia__vista-previa">
-                    <img class="tarjeta-noticia__imagen" src="img/campus/secreto.jpg" alt="estudiantes en el campus" loading="lazy">
-                    <h3 class="tarjeta-noticia__titulo">titulo de la noticia</h3>
-                    <p class="tarjeta-noticia__texto">Lorem ipsum dolor sit amet consectetur adipisicing elit. Tenetur, quia reprehenderit ad unde praesentium accusamus magnam sunt quod distinctio rem, illo natus perferendis accusantium, animi soluta! Assumenda incidunt quo totam!</p>
-                    <p class="tarjeta-noticia__autor">nombre de autor</p>
-                    <time class="tarjeta-noticia__fecha" datetime="2026-05-22">22 de mayo de 2026</time>
-                </div>
-
-                <form class="tarjeta-noticia__formulario" action="#" method="post">
-                    <div class="formulario__campo">
-                        <label class="formulario__label" for="imagen-8">Imagen</label>
-                        <img class="tarjeta-noticia__imagen" src="img/marcos/marco_para_imganes_horizontal.png" alt="marco para imágenes" id="preview-imagen-8">
-                        <input type="file" id="imagen-8" name="imagen" class="formulario__input-file" accept="image/*">
-                        <button type="button" class="formulario__btn-cambiar" onclick="document.getElementById('imagen-8').click()">Cambiar imagen</button>
-                    </div>
-                    <div class="formulario__campo">
-                        <label class="formulario__label" for="titulo-8">Título</label>
-                        <input type="text" id="titulo-8" name="titulo" class="formulario__input formulario__input--titulo" value="titulo de la noticia" required>
-                    </div>
-                    <div class="formulario__campo">
-                        <label class="formulario__label" for="texto-8">Texto</label>
-                        <textarea id="texto-8" name="texto" class="formulario__textarea" rows="4" required>Lorem ipsum...</textarea>
-                    </div>
-                    <div class="formulario__campo">
-                        <label class="formulario__label" for="autor-8">Autor</label>
-                        <input type="text" id="autor-8" name="autor" class="formulario__input" value="nombre de autor">
-                    </div>
-                    <div class="formulario__campo">
-                        <label class="formulario__label" for="fecha-8">Fecha</label>
-                        <input type="date" id="fecha-8" name="fecha" class="formulario__input" value="2026-05-22" required>
-                    </div>
-                    <div class="formulario__acciones">
-                        <button type="submit" class="formulario__btn formulario__btn--guardar">💾 Guardar</button>
-                        <button type="button" class="formulario__btn formulario__btn--cancelar">❌ Cancelar</button>
-                        <button type="button" class="formulario__btn formulario__btn--eliminar">️ Eliminar</button>
-                    </div>
-                </form>
-            </article>
-
+            @empty
+                <p>Pronto nuevos rumores del campus.</p>
+            @endforelse
+            
             <div class="grilla-noticias__ver-mas">
-                <a href="#" class="grilla-noticias__enlace-mas">
+                @php
+                    $idRumores = $noticias->where('categoria.nombre', 'rumores')->first()?->id_categoria;
+                @endphp
+                <a href="{{ $idRumores ? route('noticia.categoria', $idRumores) : '#' }}" class="grilla-noticias__enlace-mas">
                     Ver más noticias de Rumores del Campus
                 </a>
             </div>
         </section>
-    </main>
-
-    <!-- Footer con información del periódico -->
-    <footer class="pie-pagina">
-        <div class="pie-pagina__superior">
-            <div class="pie-pagina__marca">
-                <p class="pie-pagina__nombre">UMC News</p>
-                <p class="pie-pagina__descripcion">Periódico oficial de la Universidad Marítima del Caribe</p>
-            </div>
-
-            <nav class="pie-pagina__nav" aria-label="Secciones del periódico">
-                <h4 class="pie-pagina__titulo">Secciones</h4>
-                <ul class="pie-pagina__lista">
-                    <li class="pie-pagina__item"><a class="pie-pagina__enlace" href="#">Cultura</a></li>
-                    <li class="pie-pagina__item"><a class="pie-pagina__enlace" href="#">Deportes</a></li>
-                    <li class="pie-pagina__item"><a class="pie-pagina__enlace" href="#">Académico &amp; Proyectos</a></li>
-                    <li class="pie-pagina__item"><a class="pie-pagina__enlace" href="#">Rumores del Campus</a></li>
-                </ul>
-            </nav>
-
-            <nav class="pie-pagina__nav" aria-label="Información de la redacción">
-                <h4 class="pie-pagina__titulo">La Redacción</h4>
-                <ul class="pie-pagina__lista">
-                    <li class="pie-pagina__item"><a class="pie-pagina__enlace" href="#">Quiénes somos</a></li>
-                    <li class="pie-pagina__item"><a class="pie-pagina__enlace" href="#">Política editorial</a></li>
-                    <li class="pie-pagina__item"><a class="pie-pagina__enlace" href="#">Equipo 2026</a></li>
-                </ul>
-            </nav>
-
-            <nav class="pie-pagina__nav" aria-label="Cómo participar">
-                <h4 class="pie-pagina__titulo">Participa</h4>
-                <ul class="pie-pagina__lista">
-                    <li class="pie-pagina__item"><a class="pie-pagina__enlace" href="#">Enviar una nota</a></li>
-                    <li class="pie-pagina__item"><a class="pie-pagina__enlace" href="#">Carta al editor</a></li>
-                    <li class="pie-pagina__item"><a class="pie-pagina__enlace" href="#">Voluntariado</a></li>
-                </ul>
-            </nav>
-        </div>
-
-        <div class="pie-pagina__inferior">
-            <p>© <time datetime="2026">2026</time> UMC News — Universidad Marítima del Caribe. Todos los derechos reservados.</p>
-        </div>
-    </footer>
-
- <script src="{{ asset('js/home.js') }}" defer></script>   
-</body>
-
-</html>
-
-
-
-<!--
-<x-layout>
-    <div class="row m-4">
-        <div class="col-12">
-            @if(session('message'))
-                <div class="alert alert-secondary my-2">{{ session('message') }}</div>
-            @endif
-
-            <a href="{{ route('noticia.create') }}" class="btn btn-primary">Nueva Noticia</a>
-        </div>
-
-        <div class="col-12 mt-4">
-            <ul>
-                @foreach($noticias as $noticia)
-                    <li class="mb-2">
-                        <strong>{{ $noticia->titulo ?? $noticia->title }}</strong>
-                        <a href="{{ route('noticia.edit', $noticia) }}" class="btn btn-warning">editar</a>
-                        <form method="POST" action="{{ route('noticia.destroy', $noticia) }}" style="display:inline;">
-                            @csrf @method('DELETE')
-                            <button class="btn btn-danger">Eliminar</button>
-                        </form>
-                    </li>
-                @endforeach
-            </ul>
-
-            {{ $noticias->links() }}
-        </div>
-    </div>
-</x-layout>
--->
+</x-app-layout>

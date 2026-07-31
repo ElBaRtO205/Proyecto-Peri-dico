@@ -22,7 +22,7 @@ class LoginController extends Controller
             $request->session()->regenerate();
 
             // Si es exitoso, redirige al panel administrativo del CRUD
-            return redirect()->intended(route('noticia.index'));
+            return redirect()->intended(route('admin.noticias.index'));
         }
 
         // Si falla regresa al formulario con un error

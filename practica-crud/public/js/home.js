@@ -2,32 +2,13 @@
         // Esperar a que el documento cargue completamente
         document.addEventListener('DOMContentLoaded', function () {
 
-            // Botón de modo admin
-            const btnAdmin = document.querySelector('.barra-superior__btn-admin');
-
-            if (btnAdmin) {
-                btnAdmin.addEventListener('click', function () {
-                    // Alternar la clase 'modo-admin' en el body
-                    document.body.classList.toggle('modo-admin');
-
-                    // Cambiar el texto y estilo del botón
-                    if (document.body.classList.contains('modo-admin')) {
-                        this.innerHTML = '<i class="fas fa-xmark"></i> Salir Admin';
-                        this.classList.add('activo');
-                    } else {
-                        this.innerHTML = '<i class="fas fa-gear"></i> Admin';
-                        this.classList.remove('activo');
-                    }
-                });
-            }
-
-            // Botón de búsqueda
+            // Botón de busqueda
             const btnBuscar = document.querySelector('.encabezado__btn-buscar');
             const barraBusqueda = document.querySelector('.encabezado__busqueda');
             const inputBuscar = document.querySelector('.encabezado__input-buscar');
             const btnCerrarBuscar = document.querySelector('.encabezado__btn-cerrar-buscar');
 
-            // Abrir búsqueda
+            // Abrir busqueda
             if (btnBuscar && barraBusqueda) {
                 btnBuscar.addEventListener('click', function () {
                     barraBusqueda.classList.add('activo');
@@ -38,7 +19,7 @@
                 });
             }
 
-            // Cerrar búsqueda
+            // Cerrar busqueda
             if (btnCerrarBuscar && barraBusqueda) {
                 btnCerrarBuscar.addEventListener('click', function () {
                     barraBusqueda.classList.remove('activo');
@@ -46,7 +27,7 @@
                 });
             }
 
-            // Cerrar búsqueda con tecla Escape
+            // Cerrar busqueda con tecla Escape
             document.addEventListener('keydown', function (e) {
                 if (e.key === 'Escape' && barraBusqueda.classList.contains('activo')) {
                     barraBusqueda.classList.remove('activo');
@@ -75,7 +56,7 @@
                 });
             }
 
-            // Preview de imágenes en formularios
+            // Preview de imagenes en formularios
             document.querySelectorAll('.formulario__input-file').forEach(input => {
                 input.addEventListener('change', function (e) {
                     const file = e.target.files[0];
@@ -92,7 +73,7 @@
                 });
             });
 
-            // Confirmación de eliminación
+            // Confirmacion de eliminacion
             document.querySelectorAll('.formulario__btn--eliminar').forEach(btn => {
                 btn.addEventListener('click', function (e) {
                     e.preventDefault();
@@ -102,7 +83,7 @@
                 });
             });
 
-            // Confirmación de cancelación
+            // Confirmacion de cancelacion
             document.querySelectorAll('.formulario__btn--cancelar').forEach(btn => {
                 btn.addEventListener('click', function (e) {
                     e.preventDefault();
@@ -113,7 +94,7 @@
             });
         });
 
-        // Función para desactivar modo admin (usada por el botón cancelar del hero)
+        // Funcion para desactivar modo admin (usada por el botón cancelar del hero)
         function desactivarModoAdminHero() {
             const btn = document.querySelector('.barra-superior__btn-admin');
             document.body.classList.remove('modo-admin');
@@ -122,3 +103,46 @@
                 btn.classList.remove('activo');
             }
         }
+//funciones para el video picture-in-picture
+
+(function() {
+    const videoSection = document.getElementById('videoSection');
+    const videoPlayerContainer = document.getElementById('videoPlayerContainer');
+    const closeFloatingBtn = document.getElementById('closeFloatingBtn');
+
+    if (!videoSection || !videoPlayerContainer) return;
+
+    let isFloating = false;
+    let userClosedIt = false; // Si el usuario lo cierra, no vuelve a joder hasta que recargue
+
+    function handleScroll() {
+        if (userClosedIt) return;
+
+        const rect = videoSection.getBoundingClientRect();
+
+        // Si la parte inferior del video original sale de la pantalla superior (borde < 80px)
+        if (rect.bottom < 80) {
+            if (!isFloating) {
+                videoPlayerContainer.classList.add('is-floating');
+                isFloating = true;
+            }
+        } else {
+            // Si el usuario vuelve a subir y el bloque original es visible de nuevo
+            if (isFloating) {
+                videoPlayerContainer.classList.remove('is-floating');
+                isFloating = false;
+            }
+        }
+    }
+
+    // Evento para el botón cerrar
+    closeFloatingBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        videoPlayerContainer.classList.remove('is-floating');
+        isFloating = false;
+        userClosedIt = true; // Evita que se vuelva a activar al hacer scroll
+    });
+
+    window.addEventListener('scroll', handleScroll);
+    handleScroll(); // Verificación inicial
+})();
