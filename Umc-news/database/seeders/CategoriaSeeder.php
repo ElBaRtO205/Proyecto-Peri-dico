@@ -2,9 +2,9 @@
 
 namespace Database\Seeders;
 
+use App\Models\Categoria;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\DB;
 
 class CategoriaSeeder extends Seeder
 {
@@ -29,15 +29,14 @@ class CategoriaSeeder extends Seeder
             ],
         ];
 
-        // updateOrCreate para poder re-sembrar sin chocar con el unique()
-        foreach ($categorias as $cat) {
-            DB::table('categorias')->updateOrInsert(
-                ['nombre' => $cat['nombre']],
-                ['descripcion' => $cat['descripcion']]
+        // Usamos el modelo para que el evento saving genere el slug público.
+        foreach ($categorias as $categoria) {
+            Categoria::updateOrCreate(
+                ['nombre' => $categoria['nombre']],
+                ['descripcion' => $categoria['descripcion']]
             );
         }
 
-        // Invalidamos el caché que lee el layout en cada petición
         Cache::forget('categorias.activas');
     }
 }

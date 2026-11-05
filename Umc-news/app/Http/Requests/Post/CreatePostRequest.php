@@ -24,12 +24,13 @@ class CreatePostRequest extends FormRequest
     {
         return [
             'titulo' => 'required|string|max:255',
-        'contenido' => 'required|string',
-        'autor' => 'required|string',
-        'imagen_noticia' => 'image|mimes:jpeg,png,jpg,webp|max:2048',
-        'id_categoria' => 'required|exists:categorias,id_categoria',
-        'status' => 'required|in:publicado,borrador',
-        'es_principal' => 'nullable|boolean',
+            'contenido' => 'required|string',
+            'autor' => 'required|string',
+            'imagen_noticia' => 'image|mimes:jpeg,png,jpg,webp|max:2048',
+            'id_categoria' => 'required|exists:categorias,id_categoria',
+            'status' => 'required|in:publicado,borrador,programado',
+            'programada_para' => 'nullable|required_if:status,programado|date',
+            'es_principal' => 'nullable|boolean',
         ];
     }
 }

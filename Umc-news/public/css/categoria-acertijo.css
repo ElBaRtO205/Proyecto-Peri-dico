@@ -1,0 +1,105 @@
+.susurro-acertijo-banner {
+                        max-width: 700px;
+                        margin: 0 auto 2rem;
+                        text-align: center;
+                    }
+                    .susurro-acertijo__icono {
+                        display: inline-flex;
+                        align-items: center;
+                        justify-content: center;
+                        width: 42px;
+                        height: 42px;
+                        border-radius: 50%;
+                        background: rgba(15, 23, 42, 0.08);
+                        color: #64748b;
+                        cursor: pointer;
+                        transition: all 0.3s ease;
+                    }
+                    .susurro-acertijo__icono:hover {
+                        background: #0f172a;
+                        color: #38bdf8;
+                        transform: rotate(15deg) scale(1.1);
+                    }
+                    .susurro-acertijo__cuerpo {
+                        margin-top: 12px;
+                        padding: 1.25rem;
+                        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+                        color: #e2e8f0;
+                        border-radius: 12px;
+                        box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+                        border: 1px solid rgba(56, 189, 248, 0.25);
+                    }
+                    .susurro-acertijo__etiqueta {
+                        font-size: 0.72rem;
+                        text-transform: uppercase;
+                        letter-spacing: 2px;
+                        color: #38bdf8;
+                        display: block;
+                        margin-bottom: 6px;
+                    }
+                    .susurro-acertijo__pregunta {
+                        font-style: italic;
+                        font-size: 1rem;
+                        margin: 0.5rem 0;
+                    }
+                    .susurro-acertijo__pista {
+                        display: block;
+                        color: #94a3b8;
+                        margin-bottom: 10px;
+                    }
+                    .susurro-acertijo__form {
+                        display: flex;
+                        gap: 8px;
+                        max-width: 400px;
+                        margin: 10px auto 0;
+                    }
+                    .susurro-acertijo__form input {
+                        flex: 1;
+                        padding: 8px 12px;
+                        border-radius: 6px;
+                        border: 1px solid #334155;
+                        background: #090d16;
+                        color: #fff;
+                    }
+                    .susurro-acertijo__form button {
+                        padding: 8px 16px;
+                        border-radius: 6px;
+                        border: none;
+                        background: #0284c7;
+                        color: #fff;
+                        cursor: pointer;
+                        font-weight: 600;
+                    }
+                    .susurro-acertijo__msg {
+                        margin-top: 8px;
+                        font-size: 0.85rem;
+                        display: none;
+                    }
+
+.susurro-acertijo__cuerpo.oculto {
+    display: none;
+}
+
+.susurro-acertijo__msg.visible {
+    display: block;
+}
+
+.susurro-acertijo__msg.exito {
+    color: #38bdf8;
+}
+
+.susurro-acertijo__msg.error {
+    color: #f87171;
+}
+
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}

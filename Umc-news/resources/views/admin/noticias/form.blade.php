@@ -53,6 +53,7 @@
                         <label for="status">Status</label>
                         <select name="status" id="status" class="form-control">
                             <option value="borrador" @selected(old('status', $noticia->status) === 'borrador')>Borrador</option>
+                            <option value="programado" @selected(old('status', $noticia->status) === 'programado')>Programado</option>
                             <option value="publicado" @selected(old('status', $noticia->status) === 'publicado')>Publicado</option>
                         </select>
                     </div>
@@ -68,6 +69,14 @@
                             @endforeach
                         </select>
                     </div>
+                </div>
+
+                <!-- Publicación programada -->
+                <div class="form-group">
+                    <label for="programada_para">Fecha y hora de publicación programada</label>
+                    <input type="datetime-local" name="programada_para" id="programada_para" class="form-control"
+                           value="{{ old('programada_para', $noticia->programada_para?->format('Y-m-d\TH:i')) }}">
+                    <p class="help-text">Solo se usa cuando el estado es <strong>Programado</strong>. La noticia aparecerá automáticamente en esa fecha y hora (America/Caracas).</p>
                 </div>
 
                 <!-- Autor -->
@@ -96,5 +105,27 @@
 
             </form>
         </div>
+
+        @if($noticia->exists && isset($auditorias) && $auditorias->isNotEmpty())
+            <div class="admin-card admin-card--spaced">
+                <div class="admin-card-header">
+                    <h2><i class="fas fa-clock-rotate-left" aria-hidden="true"></i> Historial de cambios</h2>
+                </div>
+
+                <ul class="admin-history">
+                    @foreach($auditorias as $registro)
+                        <li class="admin-history__item">
+                            <span class="admin-pill admin-pill--{{ $registro->accion }}">
+                                {{ $registro->accion }}
+                            </span>
+                            <strong>{{ $registro->usuario?->nombre_completo ?? 'Sistema' }}</strong>
+                            <span class="admin-history__time">
+                                {{ $registro->created_at?->format('d/m/Y h:i A') }}
+                            </span>
+                        </li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
     </div>
 </x-admin-layout>

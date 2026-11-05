@@ -18,13 +18,13 @@ return new class extends Migration
         $usados = DB::table('noticias')->pluck('slug')->filter()->flip();
 
         DB::table('noticias')->orderBy('id_noticia')->each(function ($noticia) use (&$usados) {
-            $base = Str::slug($noticia->titulo) ?: 'noticia-' . $noticia->id_noticia;
+            $base = Str::slug($noticia->titulo) ?: 'noticia-'.$noticia->id_noticia;
             $slug = $base;
             $contador = 1;
 
             // Evita duplicados agregando un sufijo numérico
             while (isset($usados[$slug])) {
-                $slug = $base . '-' . $contador++;
+                $slug = $base.'-'.$contador++;
             }
 
             $usados[$slug] = true;

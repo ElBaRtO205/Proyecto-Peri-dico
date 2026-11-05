@@ -10,6 +10,7 @@ class MensajeContacto extends Model
     use HasFactory;
 
     protected $table = 'mensajes_contacto';
+
     protected $primaryKey = 'id_mensaje';
 
     protected $fillable = [

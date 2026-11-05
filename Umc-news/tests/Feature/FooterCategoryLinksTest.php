@@ -14,9 +14,9 @@ test('footer section links point to their matching categories', function () {
 
     $response = $this->get(route('home'))->assertOk();
 
-    $response->assertSee('href="'.route('noticia.categoria', $cultura->id_categoria).'"', false)
-        ->assertSee('href="'.route('noticia.categoria', $deportes->id_categoria).'"', false)
-        ->assertSee('href="'.route('noticia.categoria', $campus->id_categoria).'"', false)
+    $response->assertSee('href="'.route('noticia.categoria', $cultura).'"', false)
+        ->assertSee('href="'.route('noticia.categoria', $deportes).'"', false)
+        ->assertSee('href="'.route('noticia.categoria', $campus).'"', false)
         ->assertSee('Rumores del Campus')
         ->assertDontSee('href="#">Rumores del Campus', false);
 });

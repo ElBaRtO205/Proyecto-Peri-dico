@@ -424,22 +424,6 @@
     color: var(--color-acento);
 }
 
-/* Modo oscuro */
-[data-theme="dark"] .contacto-card,
-[data-theme="dark"] .contacto-info {
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
-}
-
-[data-theme="dark"] .contacto-card__icono--dorado {
-    color: #f0d98a;
-    background: rgba(212, 175, 55, 0.14);
-}
-
-[data-theme="dark"] .contacto-form__campo input::placeholder,
-[data-theme="dark"] .contacto-form__campo textarea::placeholder {
-    color: #7f8a9a;
-}
-
 /* Responsive */
 @media (max-width: 900px) {
     .contacto-grid {

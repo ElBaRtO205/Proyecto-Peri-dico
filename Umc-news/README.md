@@ -1,59 +1,138 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# UMC News
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Periódico oficial de la Universidad Marítima del Caribe, construido con Laravel 12 y Blade. Incluye portada dinámica, noticias con SEO, comentarios moderados, publicación programada, historial de cambios y la sección secreta **Soplar al Viento**.
 
-## About Laravel
+## Requisitos
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- PHP 8.2 o superior con las extensiones habituales de Laravel (`pdo`, `mbstring`, `openssl`, `fileinfo`, `gd`).
+- Composer 2.
+- SQLite para desarrollo rápido, o MySQL/MariaDB para producción.
+- No requiere Node.js ni Vite: los estilos y scripts se sirven directamente desde `public/`.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Instalación local
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+```bash
+composer install
+cp .env.example .env
+php artisan key:generate
+php artisan migrate --seed
+php artisan serve
+```
 
-## Learning Laravel
+La configuración de ejemplo usa SQLite. Crea el archivo si no existe:
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+```bash
+touch database/database.sqlite
+```
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+Para usar MySQL, ajusta en `.env`:
 
-## Laravel Sponsors
+```dotenv
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=umc_news
+DB_USERNAME=root
+DB_PASSWORD=
+```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+El seeder del administrador exige una contraseña de al menos 12 caracteres:
 
-### Premium Partners
+```dotenv
+ADMIN_PASSWORD=una-clave-segura-de-12-o-mas
+```
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+Después ejecuta `php artisan db:seed`.
 
-## Contributing
+## Zona horaria
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+El proyecto trabaja en `America/Caracas`:
 
-## Code of Conduct
+```dotenv
+APP_TIMEZONE=America/Caracas
+DB_TIMEZONE=-04:00
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## Comandos útiles
 
-## Security Vulnerabilities
+```bash
+php artisan migrate              # aplicar migraciones
+php artisan migrate:fresh --seed # recrear la base con datos iniciales
+php artisan test                 # ejecutar la suite de pruebas
+vendor/bin/pint                  # formatear el código PHP
+vendor/bin/pint --test           # comprobar formato sin modificar archivos
+php artisan schedule:list        # ver tareas programadas
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+En producción, programa el scheduler de Laravel cada minuto:
 
-## License
+```cron
+* * * * * cd /ruta/al/proyecto && php artisan schedule:run >> /dev/null 2>&1
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Esto publica automáticamente las noticias en estado **Programado** cuando llega su fecha y hora.
+
+## Funcionalidades principales
+
+- **Portada dinámica**: las secciones se generan desde las categorías reales de la base de datos, con un máximo de 4 noticias por sección.
+- **Categorías con slug**: URLs como `/categoria/campus`; los enlaces antiguos por ID redirigen con `301`.
+- **Noticias**: borrador, publicado y programado; noticia principal con promoción automática si la actual se elimina o pasa a borrador.
+- **SEO**: metadatos, Open Graph, Twitter Cards, JSON-LD `NewsArticle`, RSS en `/feed.xml` y sitemap en `/sitemap.xml`.
+- **Comentarios**: solo usuarios registrados, validación de noticia publicada, honeypot, rate limit, moderación y paginación.
+- **Roles**: `Administrador` y `Lector`. Los lectores pueden comentar y acceder a la sección secreta tras resolver el acertijo.
+- **Panel de administración**: barra lateral con navegación, métricas de publicaciones, pendientes de moderación, publicaciones recientes y diseño adaptable a móvil.
+- **Moderación visual**: comentarios, mensajes y auditoría comparten tarjetas, filtros y estados consistentes.
+- **Soplar al Viento**: susurros anónimos con filtros, aliento y acceso protegido por autenticación más acertijo. Los administradores pueden usar **Limpiar todo** para borrar susurros, acertijos y claves de acceso.
+- **Auditoría**: historial de creaciones, ediciones y eliminaciones de noticias.
+- **Tiempo de lectura** estimado en cada noticia y en las tarjetas de portada/categoría.
+- **Transiciones de página**: portada, categorías y noticias aparecen desde abajo; respetan la preferencia de movimiento reducido del sistema.
+
+## Panel de administración
+
+El panel vive en `/admin/noticias` y requiere rol `Administrador`:
+
+- **Panel**: métricas de publicaciones, pendientes de comentarios y mensajes, y listado de noticias recientes.
+- **Comentarios**: aprobación, rechazo y eliminación con filtros por estado.
+- **Mensajes**: buzón de contacto con marcado de leído y respuesta por correo.
+- **Historial**: auditoría de creaciones, ediciones y eliminaciones.
+- **Acertijo**: edición del acertijo diario desde el propio panel.
+- **Soplar al Viento**: acceso rápido y opción **Limpiar todo** para dejar la sección sin susurros, sin acertijo y sin clave de acceso.
+
+## Estructura relevante
+
+```text
+app/
+  Console/Commands/       Comando de publicación programada
+  Http/Controllers/       Noticias, comentarios, contacto, feeds, sección secreta
+  Models/                 Noticia, Categoria, Comentario, Usuario, auditoría, etc.
+database/
+  migrations/             Esquema y cambios incrementales
+  seeders/                Administrador y categorías iniciales
+public/
+  css/                    Hojas de estilo por pantalla
+  js/                     Scripts de la portada, noticias, categorías y panel
+resources/views/          Vistas Blade
+routes/web.php            Rutas públicas y del panel
+routes/console.php        Tareas programadas
+tests/Feature/            Pruebas de comportamiento
+```
+
+## Pruebas y CI
+
+La suite usa Pest y SQLite en memoria:
+
+```bash
+php artisan test
+```
+
+El repositorio incluye un flujo de GitHub Actions en `.github/workflows/ci.yml` que ejecuta las pruebas y comprueba el formato con Pint en cada push y pull request.
+
+## Notas de mantenimiento
+
+- Los assets viven en `public/css` y `public/js`; no hay build de Vite/Tailwind.
+- Para una categoría nueva no hace falta tocar código: se crea en la base de datos y aparece automáticamente en la portada, el menú y el footer.
+- La sección **Campus** muestra el acertijo únicamente a usuarios autenticados.
+- Si se ejecuta **Limpiar todo** en Soplar al Viento, la sección queda solo para administradores hasta que se cree un acertijo nuevo.
+- Las noticias eliminadas conservan su rastro en la auditoría aunque la fila original ya no exista.
+- Las transiciones están en `public/css/estilos.css` y `public/js/transiciones-pagina.js`; se desactivan con `prefers-reduced-motion`.
+- El comando `noticias:publicar-programadas` debe ejecutarse cada minuto mediante el scheduler de Laravel.

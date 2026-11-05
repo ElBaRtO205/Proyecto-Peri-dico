@@ -57,7 +57,7 @@ class LoginController extends Controller
             'usuario' => $data['usuario'],
             'email' => $data['email'],
             'contrasena' => Hash::make($data['password']),
-            'rol' => 'Editor',
+            'rol' => 'Lector',
         ]);
 
         Auth::login($usuario);
@@ -65,11 +65,13 @@ class LoginController extends Controller
 
         return redirect()->route('home')->with('status', 'Tu cuenta fue creada correctamente.');
     }
+
     public function logout(Request $request)
     {
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
+
         return redirect('/');
     }
 }

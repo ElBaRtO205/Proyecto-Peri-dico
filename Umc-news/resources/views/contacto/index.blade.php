@@ -8,7 +8,7 @@
         $esPodcast = old('tipo') === 'podcast';
     @endphp
 
-    <main class="contacto-page">
+    <div class="contacto-page">
         <header class="contacto-hero">
             <span class="contacto-hero__eyebrow">
                 <i class="fas fa-paper-plane"></i> Participa en UMC News
@@ -201,5 +201,5 @@
                 </div>
             </aside>
         </div>
-    </main>
+    </div>
 </x-app-layout>

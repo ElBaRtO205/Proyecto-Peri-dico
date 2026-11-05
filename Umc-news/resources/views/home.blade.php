@@ -67,6 +67,10 @@
                         <time class="tarjeta-noticia__fecha" datetime="{{ $noticia->fecha_publicacion?->format('Y-m-d') }}">
                             {{ $noticia->fecha_publicacion?->format('d/m/Y') }}
                         </time>
+                        <span class="tiempo-lectura">
+                            <i class="far fa-clock" aria-hidden="true"></i>
+                            {{ $noticia->tiempo_lectura }} min
+                        </span>
                     </a>
                 </article>
             @empty
@@ -74,7 +78,7 @@
             @endforelse
 
             <div class="grilla-noticias__ver-mas">
-                <a href="{{ $seccion['categoria'] ? route('noticia.categoria', $seccion['categoria']->id_categoria) : '#' }}"
+                <a href="{{ route('noticia.categoria', $seccion['categoria']) }}"
                    class="grilla-noticias__enlace-mas">
                     Ver más noticias de {{ $seccion['nombre'] }}
                 </a>
@@ -82,23 +86,27 @@
         </section>
     @endforeach
 
-    <!-- ==================== SELLO OCULTO: SOPLAR AL VIENTO ==================== -->
-    @php
-        $acertijoActual = \App\Models\Acertijo::where('activo', true)->orderByDesc('id_acertijo')->first();
-        $desbloqueadoHoy = ($acertijoActual && session('acertijo_resuelto_id') == $acertijoActual->id_acertijo)
-            || auth()->user()?->isAdmin();
-    @endphp
+    <!-- ==================== SELLO OCULTO: SOPLAR AL VIENTO ====================
+         Solo lo ven las personas registradas. Para entrar también deben
+         resolver el acertijo activo. -->
+    @auth
+        @php
+            $acertijoActual = \App\Models\Acertijo::where('activo', true)->orderByDesc('id_acertijo')->first();
+            $desbloqueadoHoy = ($acertijoActual && session('acertijo_resuelto_id') == $acertijoActual->id_acertijo)
+                || auth()->user()?->isAdmin();
+        @endphp
 
-    <div class="sello-misterioso-container">
-        @if($desbloqueadoHoy)
-            <a href="{{ route('secreto.index') }}" class="sello-misterioso sello-misterioso--activo" title="Entrar a Soplar al Viento">
-                <img src="{{ asset('img/umc_news_logo.svg') }}" alt="Sello UMC" class="sello-misterioso__icono">
-                <span class="sello-misterioso__texto">Soplar al viento...</span>
-            </a>
-        @else
-            <div class="sello-misterioso sello-misterioso--bloqueado" title="El viento guarda silencio...">
-                <img src="{{ asset('img/umc_news_logo.svg') }}" alt="Sello UMC" class="sello-misterioso__icono">
-            </div>
-        @endif
-    </div>
+        <div class="sello-misterioso-container">
+            @if($desbloqueadoHoy)
+                <a href="{{ route('secreto.index') }}" class="sello-misterioso sello-misterioso--activo" title="Entrar a Soplar al Viento">
+                    <img src="{{ asset('img/umc_news_logo.svg') }}" alt="Sello UMC" class="sello-misterioso__icono">
+                    <span class="sello-misterioso__texto">Soplar al viento...</span>
+                </a>
+            @else
+                <div class="sello-misterioso sello-misterioso--bloqueado" title="El viento guarda silencio...">
+                    <img src="{{ asset('img/umc_news_logo.svg') }}" alt="Sello UMC" class="sello-misterioso__icono">
+                </div>
+            @endif
+        </div>
+    @endauth
 </x-app-layout>

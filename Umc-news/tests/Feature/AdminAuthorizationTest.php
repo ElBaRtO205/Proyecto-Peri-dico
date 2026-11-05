@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\Acertijo;
+use App\Models\Susurro;
 use App\Models\Usuario;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
@@ -11,35 +13,35 @@ test('guests are redirected to login when accessing news management', function (
         ->assertRedirect(route('login'));
 });
 
-test('editors cannot access news management', function () {
-    $editor = new Usuario();
-    $editor->forceFill(['rol' => 'Editor']);
+test('lectors cannot access news management', function () {
+    $lector = new Usuario;
+    $lector->forceFill(['rol' => 'Lector']);
 
-    $this->actingAs($editor)
+    $this->actingAs($lector)
         ->get(route('admin.noticias.index'))
         ->assertForbidden();
 });
 
-test('editors can sign in but cannot access news management', function () {
+test('lectors can sign in but cannot access news management', function () {
     Usuario::create([
-        'nombre_completo' => 'Editor de prueba',
-        'usuario' => 'editor-prueba',
-        'email' => 'editor@example.test',
+        'nombre_completo' => 'Lector de prueba',
+        'usuario' => 'lector-prueba',
+        'email' => 'lector@example.test',
         'contrasena' => Hash::make('password-seguro'),
-        'rol' => 'Editor',
+        'rol' => 'Lector',
     ]);
 
     $this->post(route('login'), [
-        'email' => 'editor@example.test',
+        'email' => 'lector@example.test',
         'password' => 'password-seguro',
     ])->assertRedirect(route('home'));
 
-    $this->assertAuthenticatedAs(Usuario::where('email', 'editor@example.test')->first());
+    $this->assertAuthenticatedAs(Usuario::where('email', 'lector@example.test')->first());
 
     $this->get(route('admin.noticias.index'))->assertForbidden();
 });
 
-test('registration creates and signs in an editor account', function () {
+test('registration creates and signs in a lector account', function () {
     $this->post(route('register'), [
         'nombre_completo' => 'Estudiante de prueba',
         'usuario' => 'estudiante-prueba',
@@ -52,7 +54,7 @@ test('registration creates and signs in an editor account', function () {
 
     $user = Usuario::where('email', 'estudiante@example.test')->firstOrFail();
 
-    expect($user->rol)->toBe('Editor')
+    expect($user->rol)->toBe('Lector')
         ->and(Hash::check('password-seguro', $user->contrasena))->toBeTrue();
 
     $this->assertAuthenticatedAs($user);
@@ -81,7 +83,7 @@ test('registration validates required and unique account fields', function () {
         'usuario' => 'cuenta-existente',
         'email' => 'existente@example.test',
         'contrasena' => Hash::make('password-seguro'),
-        'rol' => 'Editor',
+        'rol' => 'Lector',
     ]);
 
     $this->from(route('login'))
@@ -96,7 +98,7 @@ test('registration validates required and unique account fields', function () {
         ->assertSessionHasErrors(['email', 'usuario']);
 });
 
-test('new accounts default to the editor role', function () {
+test('new accounts default to the lector role', function () {
     $user = Usuario::create([
         'nombre_completo' => 'Usuario nuevo',
         'usuario' => 'usuario-nuevo',
@@ -104,7 +106,7 @@ test('new accounts default to the editor role', function () {
         'contrasena' => Hash::make('password-seguro'),
     ]);
 
-    expect($user->refresh()->rol)->toBe('Editor');
+    expect($user->refresh()->rol)->toBe('Lector');
 });
 
 test('administrators can sign in to the administration panel', function () {
@@ -125,40 +127,50 @@ test('administrators can sign in to the administration panel', function () {
     $this->get(route('admin.noticias.index'))->assertOk();
 });
 
-test('editors cannot update the secret riddle', function () {
-    $editor = new Usuario();
-    $editor->forceFill(['rol' => 'Editor']);
+test('lectors cannot update the secret riddle', function () {
+    $lector = new Usuario;
+    $lector->forceFill(['rol' => 'Lector']);
 
-    $this->actingAs($editor)
+    $this->actingAs($lector)
         ->post(route('admin.acertijo.store'), ['pregunta' => 'x', 'respuesta' => 'y'])
         ->assertForbidden();
 });
 
-test('editors cannot delete whispers', function () {
-    $editor = new Usuario();
-    $editor->forceFill(['rol' => 'Editor']);
+test('lectors cannot delete whispers', function () {
+    $lector = new Usuario;
+    $lector->forceFill(['rol' => 'Lector']);
 
-    $this->actingAs($editor)
+    $this->actingAs($lector)
         ->delete(route('admin.susurro.destroy', 1))
         ->assertForbidden();
 });
 
-test('editors cannot read the contact inbox', function () {
-    $editor = new Usuario();
-    $editor->forceFill(['rol' => 'Editor']);
+test('lectors cannot wipe the whisper section', function () {
+    $lector = new Usuario;
+    $lector->forceFill(['rol' => 'Lector']);
 
-    $this->actingAs($editor)
+    $this->actingAs($lector)
+        ->delete(route('admin.secreto.limpiar'))
+        ->assertForbidden();
+});
+
+test('lectors cannot read the contact inbox', function () {
+    $lector = new Usuario;
+    $lector->forceFill(['rol' => 'Lector']);
+
+    $this->actingAs($lector)
         ->get(route('admin.mensajes.index'))
         ->assertForbidden();
 });
 
 test('guests are redirected to login for admin-only tools', function () {
     $this->post(route('admin.acertijo.store'))->assertRedirect(route('login'));
+    $this->delete(route('admin.secreto.limpiar'))->assertRedirect(route('login'));
     $this->get(route('admin.mensajes.index'))->assertRedirect(route('login'));
 });
 
 test('administrators can update the secret riddle', function () {
-    $admin = new Usuario();
+    $admin = new Usuario;
     $admin->forceFill(['rol' => 'Administrador']);
 
     $this->actingAs($admin)
@@ -168,23 +180,55 @@ test('administrators can update the secret riddle', function () {
         ])
         ->assertSessionHas('message');
 
-    expect(\App\Models\Acertijo::latest('id_acertijo')->first()->respuesta)->toBe('cuatro');
+    expect(Acertijo::latest('id_acertijo')->first()->respuesta)->toBe('cuatro');
 });
 
 test('administrators can delete whispers', function () {
-    $susurro = \App\Models\Susurro::create([
+    $susurro = Susurro::create([
         'apodo' => 'anonimo',
         'contenido' => 'Susurro de prueba',
         'categoria_viento' => 'campus',
         'soplos' => 0,
     ]);
 
-    $admin = new Usuario();
+    $admin = new Usuario;
     $admin->forceFill(['rol' => 'Administrador']);
 
     $this->actingAs($admin)
         ->delete(route('admin.susurro.destroy', $susurro->id_susurro))
         ->assertSessionHas('status');
 
-    expect(\App\Models\Susurro::find($susurro->id_susurro))->toBeNull();
+    expect(Susurro::find($susurro->id_susurro))->toBeNull();
+});
+
+test('administrators can wipe all whispers, riddles and access keys', function () {
+    $acertijo = Acertijo::create([
+        'pregunta' => '¿Cuál es la clave?',
+        'respuesta' => 'brisa',
+        'activo' => true,
+    ]);
+
+    Susurro::create([
+        'apodo' => 'anonimo',
+        'contenido' => 'Susurro que debe desaparecer',
+        'categoria_viento' => 'Confesión',
+        'soplos' => 0,
+    ]);
+
+    $admin = new Usuario;
+    $admin->forceFill(['rol' => 'Administrador']);
+
+    $this->actingAs($admin)
+        ->withSession([
+            'acertijo_resuelto_id' => $acertijo->id_acertijo,
+            'soplado_1' => true,
+        ])
+        ->delete(route('admin.secreto.limpiar'))
+        ->assertRedirect(route('secreto.index'))
+        ->assertSessionHas('status')
+        ->assertSessionMissing('acertijo_resuelto_id')
+        ->assertSessionMissing('soplado_1');
+
+    expect(Susurro::count())->toBe(0)
+        ->and(Acertijo::count())->toBe(0);
 });

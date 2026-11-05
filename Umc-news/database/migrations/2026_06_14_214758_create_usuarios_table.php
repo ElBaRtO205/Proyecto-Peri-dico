@@ -11,15 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-     Schema::create('usuarios', function (Blueprint $table) {
-        $table->id('id_usuario'); // PK
-        $table->string('nombre_completo', 150);
-        $table->string('usuario', 50)->unique();
-        $table->string('email', 100)->unique();
-        $table->string('contrasena', 255);
-        $table->enum('rol', ['Administrador', 'Editor'])->default('Editor');
-        $table->timestamp('fecha_creacion')->useCurrent();
-     });
+        Schema::create('usuarios', function (Blueprint $table) {
+            $table->id('id_usuario'); // PK
+            $table->string('nombre_completo', 150);
+            $table->string('usuario', 50)->unique();
+            $table->string('email', 100)->unique();
+            $table->string('contrasena', 255);
+            $table->enum('rol', ['Administrador', 'Editor'])->default('Editor');
+            $table->timestamp('fecha_creacion')->useCurrent();
+        });
     }
 
     /**

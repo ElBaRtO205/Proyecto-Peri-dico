@@ -11,13 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-      Schema::create('susurros', function (Blueprint $table) {
-        $table->id('id_susurro');
-        $table->string('apodo', 40)->default('Brisa Anónima');
-        $table->text('contenido');
-        $table->string('categoria_viento', 30)->default('Confesión');
-        $table->unsignedInteger('soplos')->default(0);
-        $table->timestamp('fecha_publicacion')->useCurrent();
+        Schema::create('susurros', function (Blueprint $table) {
+            $table->id('id_susurro');
+            $table->string('apodo', 40)->default('Brisa Anónima');
+            $table->text('contenido');
+            $table->string('categoria_viento', 30)->default('Confesión');
+            $table->unsignedInteger('soplos')->default(0);
+            $table->timestamp('fecha_publicacion')->useCurrent();
         });
     }
 

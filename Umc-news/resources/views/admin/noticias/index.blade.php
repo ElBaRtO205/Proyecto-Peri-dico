@@ -1,99 +1,164 @@
 <x-admin-layout>
 
-    
+    @php
+        $acertijoActualAdmin = \App\Models\Acertijo::where('activo', true)->orderByDesc('id_acertijo')->first();
+        $totalPublicaciones = $noticias->total();
+        $publicadas = \App\Models\Noticia::where('status', 'publicado')->count();
+        $programadas = \App\Models\Noticia::where('status', 'programado')->count();
+        $borradores = \App\Models\Noticia::where('status', 'borrador')->count();
+        $mensajesSinLeer = \App\Models\MensajeContacto::where('leido', false)->count();
+        $comentariosPendientes = \App\Models\Comentario::pendientes()->count();
+    @endphp
+
     <main class="panel-admin" id="panelAdmin">
 
-        <!-- Encabezado del Panel -->
-        <header class="panel-admin__header">
+        <header class="admin-page-head">
             <div>
-                <h1 class="panel-admin__titulo">
-                    <i class="fas fa-gauge-high"></i> Panel de Administración
-                </h1>
-                <p class="panel-admin__subtitulo">Gestión de contenidos — UMC News</p>
+                <span class="admin-eyebrow">Resumen general</span>
+                <h1 class="admin-page-head__title">Panel de administración</h1>
+                <p class="admin-page-head__subtitle">
+                    Publica, revisa y da mantenimiento a los contenidos de UMC News.
+                </p>
             </div>
-            
-            <form action="{{ route('logout') }}" method="POST" class="panel-admin__logout-form">
-                @csrf
-                <button type="submit" class="panel-admin__btn-salir">
-                    <i class="fas fa-right-from-bracket"></i> Salir del Modo Admin
+
+            <div class="admin-page-head__actions">
+                <button type="button" class="admin-btn admin-btn--ghost"
+                        data-abrir-acertijo aria-haspopup="dialog" aria-controls="modalAcertijoAdmin">
+                    <i class="fas fa-key" aria-hidden="true"></i>
+                    Acertijo del día
                 </button>
-            </form>
+
+                <a href="{{ route('admin.noticias.create') }}" class="admin-btn admin-btn--primary">
+                    <i class="fas fa-plus" aria-hidden="true"></i>
+                    Nueva publicación
+                </a>
+            </div>
         </header>
 
-        <!-- Alerta de Éxito -->
         @if(session('message'))
-            <div class="alerta-exito">
-                <i class="fas fa-check-circle"></i> {{ session('message') }}
+            <div class="alerta-exito" role="status">
+                <i class="fas fa-circle-check" aria-hidden="true"></i>
+                {{ session('message') }}
             </div>
         @endif
 
-       @php
-            $acertijoActualAdmin = \App\Models\Acertijo::where('activo', true)->orderByDesc('id_acertijo')->first();
-        @endphp
+        <section class="admin-stats" aria-label="Métricas de publicaciones">
+            <article class="stat-card">
+                <span class="stat-card__icon stat-card__icon--navy" aria-hidden="true">
+                    <i class="fas fa-newspaper"></i>
+                </span>
+                <span class="stat-card__value">{{ $totalPublicaciones }}</span>
+                <span class="stat-card__label">Publicaciones totales</span>
+                <span class="stat-card__hint">Todo el archivo del periódico</span>
+            </article>
 
-        <!-- Botones de Acción del Panel -->
-        <section class="panel-admin__acciones" style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center;">
-            <a href="{{ route('admin.noticias.create') }}" class="panel-admin__btn-nueva">
-                <i class="fas fa-plus"></i> Nueva Publicación
-            </a>
+            <article class="stat-card">
+                <span class="stat-card__icon stat-card__icon--green" aria-hidden="true">
+                    <i class="fas fa-eye"></i>
+                </span>
+                <span class="stat-card__value">{{ $publicadas }}</span>
+                <span class="stat-card__label">Publicadas</span>
+                <span class="stat-card__hint">Visibles en el sitio</span>
+            </article>
 
-            <button type="button" onclick="document.getElementById('modalAcertijoAdmin').style.display='flex'" 
-                    class="panel-admin__btn-nueva" style="background: #0284c7; border: none; cursor: pointer;">
-                <i class="fas fa-wind"></i> Modificar Acertijo del Día
-            </button>
+            <article class="stat-card">
+                <span class="stat-card__icon stat-card__icon--gold" aria-hidden="true">
+                    <i class="fas fa-clock"></i>
+                </span>
+                <span class="stat-card__value">{{ $programadas }}</span>
+                <span class="stat-card__label">Programadas</span>
+                <span class="stat-card__hint">Salen automáticamente</span>
+            </article>
 
-            <a href="{{ route('secreto.index') }}" class="panel-admin__btn-nueva panel-admin__btn-nueva--claro" style="background: #334155;">
-                <i class="fas fa-mask"></i> Ver "Soplar al Viento"
-            </a>
-
-            <a href="{{ route('admin.mensajes.index') }}" class="panel-admin__btn-nueva panel-admin__btn-nueva--claro" style="background: #0f766e;">
-                <i class="fas fa-inbox"></i> Mensajes
-                ({{ \App\Models\MensajeContacto::where('leido', false)->count() }})
-            </a>
+            <article class="stat-card">
+                <span class="stat-card__icon stat-card__icon--slate" aria-hidden="true">
+                    <i class="fas fa-pen-nib"></i>
+                </span>
+                <span class="stat-card__value">{{ $borradores }}</span>
+                <span class="stat-card__label">Borradores</span>
+                <span class="stat-card__hint">Pendientes de terminar</span>
+            </article>
         </section>
 
-        <!-- Modal para Modificar el Acertijo desde el Panel Admin -->
-        <div id="modalAcertijoAdmin" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.65); z-index: 9999; align-items: center; justify-content: center; padding: 1rem;">
-            <div style="background: #1e293b; color: #f8fafc; width: 100%; max-width: 520px; border-radius: 14px; padding: 1.5rem; box-shadow: 0 20px 40px rgba(0,0,0,0.4); border: 1px solid rgba(56,189,248,0.3);">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.75rem;">
-                    <h3 style="margin: 0; font-size: 1.15rem; color: #38bdf8;">
-                        <i class="fas fa-key"></i> Acertijo Diario — Soplar al Viento
-                    </h3>
-                    <button type="button" onclick="document.getElementById('modalAcertijoAdmin').style.display='none'" 
-                            style="background: transparent; border: none; color: #94a3b8; font-size: 1.2rem; cursor: pointer;">✕</button>
-                </div>
+        <section class="admin-attention" aria-label="Pendientes de revisión">
+            <div class="admin-attention__head">
+                <h2>
+                    <i class="fas fa-bell" aria-hidden="true"></i>
+                    Requiere tu atención
+                </h2>
+            </div>
 
-                <form action="{{ route('admin.acertijo.store') }}" method="POST">
+            <div class="admin-attention__grid">
+                <a href="{{ route('admin.comentarios.index') }}" class="attention-item">
+                    <span class="attention-item__icon attention-item__icon--violet" aria-hidden="true">
+                        <i class="fas fa-comments"></i>
+                    </span>
+                    <span class="attention-item__text">
+                        <strong>{{ $comentariosPendientes }}</strong>
+                        <small>{{ $comentariosPendientes === 1 ? 'comentario pendiente' : 'comentarios pendientes' }}</small>
+                    </span>
+                    <i class="fas fa-chevron-right attention-item__arrow" aria-hidden="true"></i>
+                </a>
+
+                <a href="{{ route('admin.mensajes.index') }}" class="attention-item">
+                    <span class="attention-item__icon attention-item__icon--teal" aria-hidden="true">
+                        <i class="fas fa-envelope-open-text"></i>
+                    </span>
+                    <span class="attention-item__text">
+                        <strong>{{ $mensajesSinLeer }}</strong>
+                        <small>{{ $mensajesSinLeer === 1 ? 'mensaje sin leer' : 'mensajes sin leer' }}</small>
+                    </span>
+                    <i class="fas fa-chevron-right attention-item__arrow" aria-hidden="true"></i>
+                </a>
+            </div>
+        </section>
+
+        <!-- Modal para modificar el acertijo del día -->
+        <div id="modalAcertijoAdmin" class="modal-acertijo" role="dialog" aria-modal="true"
+             aria-labelledby="tituloModalAcertijo" hidden>
+            <div class="modal-acertijo__panel">
+                <header class="modal-acertijo__header">
+                    <div>
+                        <span class="modal-acertijo__eyebrow">Soplar al Viento</span>
+                        <h3 id="tituloModalAcertijo" class="modal-acertijo__titulo">
+                            Acertijo diario
+                        </h3>
+                    </div>
+                    <button type="button" class="modal-acertijo__cerrar" data-cerrar-acertijo
+                            aria-label="Cerrar ventana del acertijo">
+                        <i class="fas fa-xmark" aria-hidden="true"></i>
+                    </button>
+                </header>
+
+                <form action="{{ route('admin.acertijo.store') }}" method="POST" class="modal-acertijo__form">
                     @csrf
-                    <div style="margin-bottom: 12px;">
-                        <label style="display: block; font-size: 0.85rem; margin-bottom: 6px; color: #cbd5e1;">Pregunta / Acertijo (Aparecerá en Rumores del Campus):</label>
-                        <textarea name="pregunta" rows="3" required 
-                                  style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #475569; background: #0f172a; color: #fff; box-sizing: border-box;"
-                                  placeholder="Escribe el acertijo aquí...">{{ $acertijoActualAdmin->pregunta ?? '' }}</textarea>
+                    <div class="modal-acertijo__grupo">
+                        <label for="acertijoPregunta">Pregunta o acertijo</label>
+                        <textarea name="pregunta" id="acertijoPregunta" rows="3" required
+                                  placeholder="Escribe el acertijo que verán los lectores...">{{ $acertijoActualAdmin->pregunta ?? '' }}</textarea>
+                        <small class="modal-acertijo__ayuda">Aparecerá en la sección Campus del sitio.</small>
                     </div>
 
-                    <div style="margin-bottom: 12px;">
-                        <label style="display: block; font-size: 0.85rem; margin-bottom: 6px; color: #cbd5e1;">Respuesta correcta (Palabra clave):</label>
-                        <input type="text" name="respuesta" required value="{{ $acertijoActualAdmin->respuesta ?? '' }}"
-                               style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #475569; background: #0f172a; color: #fff; box-sizing: border-box;"
+                    <div class="modal-acertijo__grupo">
+                        <label for="acertijoRespuesta">Respuesta correcta</label>
+                        <input type="text" name="respuesta" id="acertijoRespuesta" required
+                               value="{{ $acertijoActualAdmin->respuesta ?? '' }}"
                                placeholder="Ej: bitacora">
                     </div>
 
-                    <div style="margin-bottom: 18px;">
-                        <label style="display: block; font-size: 0.85rem; margin-bottom: 6px; color: #cbd5e1;">Pista opcional:</label>
-                        <input type="text" name="pista" value="{{ $acertijoActualAdmin->pista ?? '' }}"
-                               style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #475569; background: #0f172a; color: #fff; box-sizing: border-box;"
+                    <div class="modal-acertijo__grupo">
+                        <label for="acertijoPista">Pista <span>(opcional)</span></label>
+                        <input type="text" name="pista" id="acertijoPista"
+                               value="{{ $acertijoActualAdmin->pista ?? '' }}"
                                placeholder="Ej: Una sola palabra...">
                     </div>
 
-                    <div style="display: flex; justify-content: flex-end; gap: 10px;">
-                        <button type="button" onclick="document.getElementById('modalAcertijoAdmin').style.display='none'"
-                                style="padding: 9px 16px; border-radius: 8px; border: 1px solid #475569; background: transparent; color: #cbd5e1; cursor: pointer;">
+                    <div class="modal-acertijo__acciones">
+                        <button type="button" class="admin-btn admin-btn--ghost" data-cerrar-acertijo>
                             Cancelar
                         </button>
-                        <button type="submit" 
-                                style="padding: 9px 18px; border-radius: 8px; border: none; background: #0284c7; color: #fff; font-weight: 600; cursor: pointer;">
-                            Guardar y Publicar Acertijo
+                        <button type="submit" class="admin-btn admin-btn--primary">
+                            Guardar y publicar
                         </button>
                     </div>
                 </form>
@@ -102,32 +167,43 @@
 
         <!-- Sección de Noticias Existentes -->
         <section class="panel-admin__seccion">
-            <h2 class="panel-admin__seccion-titulo">
-                <i class="fas fa-newspaper"></i> Publicaciones Existentes
-                <span class="contador" id="contadorPublicaciones">({{ $noticias->total() }})</span>
-            </h2>
-            
+            <header class="panel-admin__seccion-head">
+                <div>
+                    <h2 class="panel-admin__seccion-titulo">
+                        Publicaciones recientes
+                    </h2>
+                    <p class="panel-admin__seccion-subtitulo">
+                        {{ $totalPublicaciones }} {{ $totalPublicaciones === 1 ? 'noticia registrada' : 'noticias registradas' }}
+                    </p>
+                </div>
+
+                <a href="{{ route('admin.noticias.auditoria') }}" class="admin-link">
+                    Ver historial
+                    <i class="fas fa-arrow-right" aria-hidden="true"></i>
+                </a>
+            </header>
+
             <div class="grilla-admin" id="listaPublicaciones">
                 @forelse($noticias as $noticia)
                     <article class="tarjeta-admin" data-id="{{ $noticia->id_noticia }}">
-                        
-                        <!-- Imagen + Badge Principal -->
                         <div class="tarjeta-admin__imagen-wrapper">
                             @if($noticia->imagen_noticia)
                                 <img src="{{ asset('storage/' . $noticia->imagen_noticia) }}" alt="{{ $noticia->titulo }}" class="tarjeta-admin__imagen">
                             @else
                                 <div class="tarjeta-admin__sin-imagen">
-                                    <i class="fas fa-image"></i> Sin imagen
+                                    <i class="fas fa-image" aria-hidden="true"></i>
+                                    <span>Sin imagen</span>
                                 </div>
                             @endif
 
                             @if($noticia->es_principal)
-                                <span class="badge-principal">★ Principal</span>
+                                <span class="badge-principal">
+                                    <i class="fas fa-star" aria-hidden="true"></i> Principal
+                                </span>
                             @endif
                         </div>
-                        
+
                         <div class="tarjeta-admin__contenido">
-                            <!-- Metadatos (Categoría y Status) -->
                             <div class="tarjeta-admin__meta">
                                 <span class="badge-categoria">
                                     {{ $noticia->categoria->nombre ?? 'Sin categoría' }}
@@ -139,23 +215,33 @@
 
                             <h3 class="tarjeta-admin__titulo">{{ $noticia->titulo }}</h3>
 
-                            <!-- Recorte de texto a 90 caracteres -->
                             <p class="tarjeta-admin__extracto">
                                 {{ Str::limit(strip_tags($noticia->contenido), 90, '...') }}
                             </p>
 
-                            <!-- Acciones -->
+                            @if($noticia->status === 'programado' && $noticia->programada_para)
+                                <p class="tarjeta-admin__programacion">
+                                    <i class="fas fa-clock" aria-hidden="true"></i>
+                                    Se publicará el {{ $noticia->programada_para->format('d/m/Y h:i A') }}
+                                </p>
+                            @endif
+
+                            <p class="tarjeta-admin__fechas">
+                                Actualizada: {{ $noticia->updated_at?->format('d/m/Y h:i A') ?? '—' }}
+                            </p>
+
                             <footer class="tarjeta-admin__footer">
                                 <a href="{{ route('admin.noticias.edit', $noticia->id_noticia) }}" class="btn-editar">
-                                    <i class="fas fa-pen-to-square"></i> Editar
+                                    <i class="fas fa-pen-to-square" aria-hidden="true"></i> Editar
                                 </a>
 
-                                <form action="{{ route('admin.noticias.destroy', $noticia->id_noticia) }}" method="POST" 
-                                      onsubmit="return confirm('¿Estás seguro de eliminar esta noticia?');" class="form-eliminar"> 
+                                <form action="{{ route('admin.noticias.destroy', $noticia->id_noticia) }}" method="POST"
+                                      onsubmit="return confirm('¿Estás seguro de eliminar esta noticia?');" class="form-eliminar">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="btn-eliminar"> 
-                                        <i class="fas fa-trash-can"></i> Eliminar
+                                    <button type="submit" class="btn-eliminar" title="Eliminar noticia">
+                                        <i class="fas fa-trash-can" aria-hidden="true"></i>
+                                        <span>Eliminar</span>
                                     </button>
                                 </form>
                             </footer>
@@ -163,18 +249,22 @@
                     </article>
                 @empty
                     <div class="sin-noticias">
-                        <i class="fas fa-folder-open"></i>
-                        <p>No hay noticias registradas aún.</p>
+                        <i class="fas fa-folder-open" aria-hidden="true"></i>
+                        <p>No hay noticias registradas todavía.</p>
+                        <a href="{{ route('admin.noticias.create') }}" class="admin-btn admin-btn--primary">
+                            Crear la primera publicación
+                        </a>
                     </div>
                 @endforelse
             </div>
 
-            <!-- Contenedor de Paginación corregida -->
             <div class="paginacion-contenedor">
                 {{ $noticias->links('pagination::bootstrap-5') }}
             </div>
         </section>
 
     </main>
+
+    <script src="{{ asset('js/admin-acertijo-modal.js') }}" defer></script>
 
 </x-admin-layout>

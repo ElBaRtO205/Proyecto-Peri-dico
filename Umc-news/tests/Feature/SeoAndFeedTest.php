@@ -64,7 +64,7 @@ test('the article page includes seo meta and newsarticle json-ld', function () {
 test('old numeric article urls redirect permanently to the slug url', function () {
     $noticia = crearNoticiaPrueba();
 
-    $this->get('/noticia/' . $noticia->id_noticia)
+    $this->get('/noticia/'.$noticia->id_noticia)
         ->assertStatus(301)
         ->assertRedirect(route('noticia.show', $noticia->slug));
 });

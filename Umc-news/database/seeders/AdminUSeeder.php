@@ -1,8 +1,9 @@
 <?php
+
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\Usuario;
+use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
 class AdminUSeeder extends Seeder
@@ -19,10 +20,10 @@ class AdminUSeeder extends Seeder
             ['email' => 'admin@umcnews.com'], // Clave para verificar si ya existe
             [
                 'nombre_completo' => 'Administrador General',
-                'usuario'         => 'admin',
-                'email'           => 'admin@umcnews.com',
-                'contrasena'      => Hash::make($password),
-                'rol'             => 'Administrador',
+                'usuario' => 'admin',
+                'email' => 'admin@umcnews.com',
+                'contrasena' => Hash::make($password),
+                'rol' => 'Administrador',
             ]
         );
     }

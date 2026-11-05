@@ -27,7 +27,7 @@ Route::post('/logout', [LoginController::class, 'logout'])->middleware('auth')->
 |--------------------------------------------------------------------------
 */
 Route::get('/', [NoticiaController::class, 'home'])->name('home');
-Route::get('/categoria/{id}', [NoticiaController::class, 'categoria'])->name('noticia.categoria')->whereNumber('id');
+Route::get('/categoria/{categoria}', [NoticiaController::class, 'categoria'])->name('noticia.categoria');
 
 /*
 |--------------------------------------------------------------------------
@@ -43,7 +43,7 @@ Route::get('/sitemap.xml', [FeedController::class, 'sitemap'])->name('sitemap');
 |--------------------------------------------------------------------------
 */
 Route::post('/noticia/{id}/comentario', [ComentarioController::class, 'store'])
-    ->middleware('throttle:10,1')
+    ->middleware(['auth', 'throttle:5,1'])
     ->whereNumber('id')
     ->name('comentarios.store');
 
@@ -62,16 +62,18 @@ Route::post('/contacto', [ContactoController::class, 'store'])
 | Soplar al Viento (rincón secreto del campus)
 |--------------------------------------------------------------------------
 */
-Route::post('/soplar-al-viento/desbloquear', [SoplarAlVientoController::class, 'desbloquear'])
-    ->middleware('throttle:10,1')
-    ->name('secreto.desbloquear');
-Route::post('/soplar-al-viento/publicar', [SoplarAlVientoController::class, 'storeSusurro'])
-    ->middleware('throttle:5,1')
-    ->name('secreto.publicar');
-Route::post('/soplar-al-viento/{id}/soplar', [SoplarAlVientoController::class, 'soplarSusurro'])
-    ->whereNumber('id')
-    ->name('secreto.soplar');
-Route::get('/soplar-al-viento', [SoplarAlVientoController::class, 'index'])->name('secreto.index');
+Route::middleware('auth')->group(function () {
+    Route::post('/soplar-al-viento/desbloquear', [SoplarAlVientoController::class, 'desbloquear'])
+        ->middleware('throttle:10,1')
+        ->name('secreto.desbloquear');
+    Route::post('/soplar-al-viento/publicar', [SoplarAlVientoController::class, 'storeSusurro'])
+        ->middleware('throttle:5,1')
+        ->name('secreto.publicar');
+    Route::post('/soplar-al-viento/{id}/soplar', [SoplarAlVientoController::class, 'soplarSusurro'])
+        ->whereNumber('id')
+        ->name('secreto.soplar');
+    Route::get('/soplar-al-viento', [SoplarAlVientoController::class, 'index'])->name('secreto.index');
+});
 
 /*
 |--------------------------------------------------------------------------
@@ -82,6 +84,19 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::resource('noticia', NoticiaController::class)
         ->names('admin.noticias')
         ->except(['show']);
+
+    // Historial global de cambios (antes del resource implícito no choca).
+    Route::get('/admin/auditoria', [NoticiaController::class, 'auditoria'])
+        ->name('admin.noticias.auditoria');
+
+    Route::get('/admin/comentarios', [ComentarioController::class, 'adminIndex'])
+        ->name('admin.comentarios.index');
+    Route::patch('/admin/comentarios/{comentario}/aprobar', [ComentarioController::class, 'aprobar'])
+        ->name('admin.comentarios.aprobar');
+    Route::patch('/admin/comentarios/{comentario}/rechazar', [ComentarioController::class, 'rechazar'])
+        ->name('admin.comentarios.rechazar');
+    Route::delete('/admin/comentarios/{comentario}', [ComentarioController::class, 'destroy'])
+        ->name('admin.comentarios.destroy');
 });
 
 // IMPORTANTE: esta ruta pública se define DESPUÉS del resource para que
@@ -99,6 +114,7 @@ Route::get('/noticia/{slug}', [NoticiaController::class, 'show'])
 Route::middleware(['auth', EnsureUserIsAdmin::class])->group(function () {
     Route::post('/admin/acertijo', [SoplarAlVientoController::class, 'actualizarAcertijo'])->name('admin.acertijo.store');
     Route::delete('/admin/susurro/{id}', [SoplarAlVientoController::class, 'destroySusurro'])->name('admin.susurro.destroy');
+    Route::delete('/admin/soplar-al-viento/limpiar', [SoplarAlVientoController::class, 'limpiarSeccion'])->name('admin.secreto.limpiar');
 
     Route::get('/admin/mensajes', [ContactoController::class, 'adminIndex'])->name('admin.mensajes.index');
     Route::patch('/admin/mensajes/{mensaje}/leido', [ContactoController::class, 'toggleLeido'])->name('admin.mensajes.leido');

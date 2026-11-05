@@ -13,8 +13,8 @@ return new class extends Migration
 
             // Forma limpia y estándar en Laravel que asigna BIGINT UNSIGNED y crea la FK
             $table->foreignId('id_noticia')
-                  ->constrained('noticias', 'id_noticia')
-                  ->onDelete('cascade');
+                ->constrained('noticias', 'id_noticia')
+                ->onDelete('cascade');
 
             $table->string('autor');
             $table->text('contenido');

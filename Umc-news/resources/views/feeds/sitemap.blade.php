@@ -9,7 +9,7 @@
 
   @foreach ($categorias as $categoria)
     <url>
-      <loc>{{ route('noticia.categoria', $categoria->id_categoria) }}</loc>
+      <loc>{{ route('noticia.categoria', $categoria) }}</loc>
       <changefreq>weekly</changefreq>
       <priority>0.7</priority>
     </url>

@@ -20,22 +20,20 @@
     {{-- Autodiscovery del feed RSS (los lectores/ navegadores lo detectan solos) --}}
     <link rel="alternate" type="application/rss+xml" title="UMC News — Feed RSS" href="{{ url('/feed.xml') }}">
 
-    <!-- SCRIPT ANTI-PARPADEO (Carga temas y fuentes guardadas antes del render) -->
-    <script>
-        (function() {
-            const savedTheme = localStorage.getItem('umc_theme');
-            if (savedTheme) {
-                document.documentElement.setAttribute('data-theme', savedTheme);
-            }
-            const savedScale = localStorage.getItem('umc_font_scale');
-            if (savedScale) {
-                document.documentElement.style.setProperty('--tamano-fuente-base', savedScale + '%');
-            }
-        })();
-    </script>
+    @php
+        $paginaActual = match (true) {
+            request()->routeIs('home') => 'home',
+            request()->routeIs('noticia.categoria') => 'categoria',
+            request()->routeIs('noticia.show') => 'noticia',
+            default => 'general',
+        };
+    @endphp
+
 </head>
 
-<body>
+<body class="pagina pagina--{{ $paginaActual }}" data-page="{{ $paginaActual }}">
+
+    <a class="skip-link" href="#contenido-principal">Saltar al contenido principal</a>
 
     <div class="barra-superior">
         <time class="barra-superior__fecha" datetime="{{ now()->format('Y-m-d') }}">
@@ -43,12 +41,7 @@
         </time>
 
         <div class="barra-superior__acciones">
-            <!-- COMPONENTE DE ACCESIBILIDAD (A+/A- y Modo Oscuro) -->
-            <x-toolbar/>
-
             <ul class="barra-superior__lista">
-                <li class="barra-superior__item"><a class="barra-superior__enlace" href="#"><i class="fas fa-envelope"></i> Contacto</a></li>
-                <li class="barra-superior__item"><a class="barra-superior__enlace" href="#"><i class="fas fa-microphone-lines"></i> Podcast</a></li>
                 @auth
                     <li class="barra-superior__item barra-superior__usuario">Hola, {{ Auth::user()->nombre_completo }}</li>
                     @if (Auth::user()->isAdmin())
@@ -62,8 +55,9 @@
                     </li>
                 @else
                     <li class="barra-superior__item">
-                        <a href="{{ route('login') }}" class="encabezado__enlace">
-                            <i class="fas fa-right-to-bracket"></i> Iniciar Sesión
+                        <a href="{{ route('login') }}" class="btn-login">
+                            <span class="btn-login__icono"><i class="fas fa-right-to-bracket" aria-hidden="true"></i></span>
+                            <span class="btn-login__texto">Iniciar Sesión</span>
                         </a>
                     </li>
                 @endauth
@@ -85,7 +79,7 @@
             <ul class="encabezado__lista">
                 @foreach($categorias as $categoria)
                     <li class="encabezado__item">
-                        <a class="encabezado__enlace" href="{{ route('noticia.categoria', $categoria->id_categoria) }}">
+                        <a class="encabezado__enlace" href="{{ route('noticia.categoria', $categoria) }}">
                             {{ $categoria->nombre }}
                         </a>
                     </li>
@@ -115,7 +109,7 @@
                     {{-- Enlaces generados desde las categorías reales de la BD --}}
                     @forelse ($categorias as $categoria)
                         <li class="pie-pagina__item">
-                            <a class="pie-pagina__enlace" href="{{ route('noticia.categoria', $categoria->id_categoria) }}">
+                            <a class="pie-pagina__enlace" href="{{ route('noticia.categoria', $categoria) }}">
                                 {{-- La categoría "Campus" es donde vive el rincón secreto --}}
                                 {{ mb_strtolower(trim($categoria->nombre)) === 'campus' ? 'Rumores del Campus' : $categoria->nombre }}
                             </a>
@@ -157,7 +151,7 @@
     </footer>
 
    
-    <script src="{{ asset('js/toolbar.js') }}" defer></script>
+    <script src="{{ asset('js/transiciones-pagina.js') }}" defer></script>
     <script src="{{ asset('js/home.js') }}" defer></script> 
 </body>
 </html>

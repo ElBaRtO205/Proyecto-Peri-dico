@@ -104,6 +104,101 @@ body {
     background-color: rgba(255, 255, 255, 0.1);
 }
 
+/* Botón de iniciar sesión */
+.btn-login {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 15px 5px 6px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #e6c75a 0%, var(--color-acento) 50%, #b38a1c 100%);
+    color: var(--color-primario);
+    font-size: 0.88rem;
+    font-weight: 700;
+    letter-spacing: 0.015em;
+    text-decoration: none;
+    overflow: hidden;
+    isolation: isolate;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.45);
+    transition: transform 0.3s ease, box-shadow 0.3s ease, filter 0.3s ease;
+}
+
+/* Destello que recorre el botón al pasar el cursor */
+.btn-login::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background: linear-gradient(115deg, transparent 25%, rgba(255, 255, 255, 0.55) 50%, transparent 75%);
+    transform: translateX(-130%);
+    transition: transform 0.6s ease;
+}
+
+.btn-login:hover::before {
+    transform: translateX(130%);
+}
+
+.btn-login__icono {
+    position: relative;
+    z-index: 1;
+    width: 28px;
+    height: 28px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: rgba(26, 58, 92, 0.92);
+    color: #f4df9a;
+    font-size: 0.76rem;
+    box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.25);
+    transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.btn-login__texto {
+    position: relative;
+    z-index: 1;
+    white-space: nowrap;
+}
+
+/* Se conserva la animación del subrayado que crece al pasar el cursor */
+.btn-login__texto::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: -3px;
+    width: 0;
+    height: 2px;
+    border-radius: 2px;
+    background-color: var(--color-primario);
+    transform: translateX(-50%);
+    transition: width 0.3s ease;
+}
+
+.btn-login:hover {
+    color: var(--color-primario);
+    transform: translateY(-2px);
+    filter: saturate(1.08);
+    box-shadow: 0 7px 18px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+.btn-login:hover .btn-login__texto::after {
+    width: 100%;
+}
+
+.btn-login:hover .btn-login__icono {
+    background: var(--color-primario);
+    transform: rotate(-8deg) scale(1.06);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .btn-login,
+    .btn-login::before,
+    .btn-login__icono,
+    .btn-login__texto::after {
+        transition: none;
+    }
+}
+
 .barra-superior__logout {
     margin: 0;
 }
@@ -751,6 +846,18 @@ body.modo-admin .hero__titulo {
         gap: 10px;
     }
 
+    .btn-login {
+        gap: 6px;
+        padding: 4px 12px 4px 5px;
+        font-size: 0.8rem;
+    }
+
+    .btn-login__icono {
+        width: 24px;
+        height: 24px;
+        font-size: 0.68rem;
+    }
+
     .encabezado__titulo {
         font-size: 1.8rem;
     }
@@ -1204,7 +1311,7 @@ img {
     margin-top: 35px;
 }
 /* =========================================================
-   VARIABLES DE TEMA (CLARO Y OSCURO)
+   VARIABLES DE TEMA
    ========================================================= */
 :root {
     --bg-principal: #f9f7f2;
@@ -1214,82 +1321,11 @@ img {
     --color-borde-tarjeta: #e2e8f0;
     --color-primario: #1a3a5c;
     --color-acento: #d4af37;
-    --tamano-fuente-base: 100%; /* 16px por defecto */
-}
-
-/* Modo Oscuro Activado */
-[data-theme="dark"] {
-    --bg-principal: #121820;
-    --color-texto: #e2e8f0;
-    --color-texto-secundario: #a0aec0;
-    --color-tarjeta: #1a2332;
-    --color-borde-tarjeta: #2d3748;
-    --color-primario: #3b82f6; /* Azul brillante para contraste nocturno */
-    --color-acento: #f59e0b;
-}
-
-html {
-    font-size: var(--tamano-fuente-base);
-    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 body {
     background-color: var(--bg-principal);
     color: var(--color-texto);
-}
-
-/* =========================================================
-   BARRA DE ACCESIBILIDAD (TOOLBAR)
-   ========================================================= */
-.a11y-toolbar {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    gap: 15px;
-    padding: 8px 15px;
-    background-color: rgba(0, 0, 0, 0.03);
-    border-bottom: 1px solid var(--color-borde-tarjeta);
-    font-size: 0.85rem;
-}
-
-[data-theme="dark"] .a11y-toolbar {
-    background-color: rgba(255, 255, 255, 0.05);
-}
-
-.a11y-grupo {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-}
-
-.a11y-etiqueta {
-    font-weight: 600;
-    color: var(--color-texto-secundario);
-    margin-right: 3px;
-}
-
-.btn-a11y {
-    background: var(--color-tarjeta);
-    border: 1px solid var(--color-borde-tarjeta);
-    color: var(--color-texto);
-    padding: 3px 8px;
-    border-radius: 4px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.btn-a11y:hover {
-    background-color: var(--color-primario);
-    color: #ffffff;
-    border-color: var(--color-primario);
-}
-
-.btn-a11y--tema {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 4px 10px;
 }
 
 /* Indicador del tiempo de lectura */
@@ -1399,103 +1435,11 @@ body {
     transform: translateY(-2px);
 }
 /* =========================================================
-   COMPARTIR, REACCIONES Y COMENTARIOS
+   COMENTARIOS
    ========================================================= */
 
-/* 1. Botones de compartir */
-.noticia-compartir {
-    margin: 30px 0;
-    padding: 20px;
-    background-color: var(--color-tarjeta);
-    border: 1px solid var(--color-borde-tarjeta);
-    border-radius: 8px;
-}
 
-.noticia-compartir__titulo {
-    font-size: 1.1rem;
-    color: var(--color-primario);
-    margin-bottom: 15px;
-}
-
-.noticia-compartir__botones {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-}
-
-.btn-red {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 16px;
-    border-radius: 6px;
-    color: #ffffff;
-    font-size: 0.85rem;
-    font-weight: bold;
-    text-decoration: none;
-    border: none;
-    cursor: pointer;
-    transition: transform 0.2s ease, opacity 0.2s ease;
-}
-
-.btn-red:hover {
-    transform: translateY(-2px);
-    opacity: 0.9;
-}
-
-.btn-red--whatsapp { background-color: #25d366; }
-.btn-red--x { background-color: #000000; }
-[data-theme="dark"] .btn-red--x { background-color: #2f3336; }
-.btn-red--telegram { background-color: #229ed9; }
-.btn-red--copiar { background-color: var(--color-primario); }
-
-/* 2. Reacciones */
-.noticia-reacciones {
-    margin-bottom: 35px;
-    text-align: center;
-}
-
-.noticia-reacciones__titulo {
-    font-size: 1rem;
-    color: var(--color-texto-secundario);
-    margin-bottom: 15px;
-}
-
-.noticia-reacciones__contenedor {
-    display: flex;
-    justify-content: center;
-    gap: 12px;
-    flex-wrap: wrap;
-}
-
-.btn-reaccion {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 16px;
-    background-color: var(--color-tarjeta);
-    border: 1px solid var(--color-borde-tarjeta);
-    border-radius: 20px;
-    cursor: pointer;
-    color: var(--color-texto);
-    transition: all 0.2s ease;
-}
-
-.btn-reaccion:hover, .btn-reaccion.activa {
-    border-color: var(--color-acento);
-    background-color: rgba(212, 175, 55, 0.1);
-    transform: scale(1.05);
-}
-
-.btn-reaccion__contador {
-    font-size: 0.8rem;
-    font-weight: bold;
-    background-color: rgba(0,0,0,0.05);
-    padding: 2px 6px;
-    border-radius: 10px;
-}
-
-/* 3. Comentarios */
+/* Comentarios */
 .seccion-comentarios {
     margin-top: 40px;
     border-top: 2px solid var(--color-borde-tarjeta);
@@ -1695,3 +1639,80 @@ body {
     }
 }
 
+
+/* =========================================================
+   TRANSICIONES ENTRE PÁGINAS
+   Todo el contenido aparece desde abajo hacia arriba.
+   ========================================================= */
+
+@keyframes umcSubirEntrada {
+    from {
+        opacity: 0;
+        transform: translateY(46px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes umcSubirSuave {
+    from {
+        opacity: 0;
+        transform: translateY(18px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Portada: la cabecera y cada sección suben con un pequeño escalonado. */
+.pagina--home .barra-superior,
+.pagina--home .encabezado {
+    animation: umcSubirSuave 0.55s cubic-bezier(0.16, 0.84, 0.36, 1) both;
+}
+
+.pagina--home .contenido-principal > * {
+    animation: umcSubirEntrada 0.72s cubic-bezier(0.16, 0.84, 0.36, 1) both;
+}
+
+.pagina--home .contenido-principal > *:nth-child(2) { animation-delay: 0.06s; }
+.pagina--home .contenido-principal > *:nth-child(3) { animation-delay: 0.12s; }
+.pagina--home .contenido-principal > *:nth-child(4) { animation-delay: 0.18s; }
+.pagina--home .contenido-principal > *:nth-child(5) { animation-delay: 0.24s; }
+.pagina--home .contenido-principal > *:nth-child(6) { animation-delay: 0.30s; }
+.pagina--home .contenido-principal > *:nth-child(7) { animation-delay: 0.36s; }
+.pagina--home .contenido-principal > *:nth-child(8) { animation-delay: 0.42s; }
+
+/* Categorías y noticias: animamos solo el bloque de contenido.
+   No usamos "> *" aquí porque la noticia incluye elementos flotantes
+   (aviso de compartir, barra móvil) que deben conservar su opacidad. */
+.pagina--categoria .categoria-container,
+.pagina--noticia .article {
+    animation: umcSubirEntrada 0.75s cubic-bezier(0.16, 0.84, 0.36, 1) both;
+}
+
+/* Salida: el contenido se despide hacia arriba antes de cambiar de página. */
+.is-leaving .contenido-principal {
+    animation: none !important;
+    opacity: 0;
+    transform: translateY(-14px);
+    transition: opacity 0.2s ease, transform 0.24s ease;
+}
+
+/* Accesibilidad: quien prefiera menos movimiento no verá animaciones. */
+@media (prefers-reduced-motion: reduce) {
+    .pagina .contenido-principal,
+    .pagina .contenido-principal > *,
+    .pagina .categoria-container,
+    .pagina .article,
+    .pagina .barra-superior,
+    .pagina .encabezado,
+    .is-leaving .contenido-principal {
+        animation: none !important;
+        transition: none !important;
+        transform: none !important;
+        opacity: 1 !important;
+    }
+}

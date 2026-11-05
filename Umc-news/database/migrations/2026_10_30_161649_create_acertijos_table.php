@@ -11,13 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-      Schema::create('acertijos', function (Blueprint $table) {
-        $table->id('id_acertijo');
-        $table->text('pregunta');
-        $table->string('respuesta');
-        $table->string('pista')->nullable();
-        $table->boolean('activo')->default(true);
-    });
+        Schema::create('acertijos', function (Blueprint $table) {
+            $table->id('id_acertijo');
+            $table->text('pregunta');
+            $table->string('respuesta');
+            $table->string('pista')->nullable();
+            $table->boolean('activo')->default(true);
+        });
     }
 
     /**

@@ -13,23 +13,26 @@ function crearUsuarioPrueba(string $rol): Usuario
 {
     return Usuario::create([
         'nombre_completo' => 'Usuario de prueba',
-        'usuario' => 'usuario-' . strtolower($rol) . '-' . uniqid(),
-        'email' => strtolower($rol) . '-' . uniqid() . '@example.test',
+        'usuario' => 'usuario-'.strtolower($rol).'-'.uniqid(),
+        'email' => strtolower($rol).'-'.uniqid().'@example.test',
         'contrasena' => Hash::make('password-seguro'),
         'rol' => $rol,
     ]);
 }
 
-test('the admin panel keeps light text on the dark soplar and mensajes buttons', function () {
+test('the admin panel shows the sidebar navigation with its main destinations', function () {
     $admin = crearUsuarioPrueba('Administrador');
 
     $this->actingAs($admin)
         ->get(route('admin.noticias.index'))
         ->assertOk()
-        // Los dos botones con fondo oscuro deben usar la clase de texto claro
-        ->assertSee('panel-admin__btn-nueva--claro', false)
+        // La nueva estructura del panel usa una barra lateral de navegación
+        ->assertSee('admin-sidebar', false)
+        ->assertSee('admin-nav__link', false)
         ->assertSee(route('secreto.index'), false)
-        ->assertSee(route('admin.mensajes.index'), false);
+        ->assertSee(route('admin.mensajes.index'), false)
+        ->assertSee(route('admin.comentarios.index'), false)
+        ->assertSee(route('admin.noticias.create'), false);
 });
 
 test('the whisper page shows a back to admin panel link for admins', function () {
@@ -43,11 +46,11 @@ test('the whisper page shows a back to admin panel link for admins', function ()
 });
 
 test('regular visitors do not see the admin panel link on the whisper page', function () {
-    // Un Editor no es admin: no debe ver el enlace al panel
-    $editor = crearUsuarioPrueba('Editor');
+    // Un Lector no es admin: no debe ver el enlace al panel
+    $lector = crearUsuarioPrueba('Lector');
 
-    // El editor ni siquiera accede sin resolver el acertijo → lo mandamos a home
-    $this->actingAs($editor)
+    // El lector ni siquiera accede sin resolver el acertijo → lo mandamos a home
+    $this->actingAs($lector)
         ->get(route('secreto.index'))
         ->assertRedirect(route('home'));
 });

@@ -22,7 +22,7 @@ class UpdatePostRequest extends FormRequest
      */
     public function rules(): array
     {
-    
-            return (new CreatePostRequest())->rules();
+
+        return (new CreatePostRequest)->rules();
     }
 }

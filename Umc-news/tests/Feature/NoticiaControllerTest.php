@@ -3,7 +3,6 @@
 use App\Models\Categoria;
 use App\Models\Noticia;
 use App\Models\Usuario;
-use App\Services\Post\PostService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 
@@ -115,29 +114,31 @@ test('failed article update rolls back the featured article reset', function () 
         'status' => 'publicado',
     ]);
 
-    $postService = Mockery::mock(PostService::class);
-    $postService->shouldReceive('find')
-        ->once()
-        ->with($noticiaAEditar->id_noticia)
-        ->andReturn($noticiaAEditar);
-    $postService->shouldReceive('update')
-        ->once()
-        ->with($noticiaAEditar->id_noticia, Mockery::type('array'))
-        ->andReturn(false);
-    $this->app->instance(PostService::class, $postService);
+    // Simulamos un fallo justo al guardar para comprobar que la transacción
+    // revierte el destacado que ya se le había quitado a la principal.
+    Noticia::updating(function () {
+        throw new RuntimeException('Fallo simulado al actualizar.');
+    });
+
     $this->withoutExceptionHandling();
 
-    expect(fn () => $this->actingAs($admin)->put(
-        route('admin.noticias.update', $noticiaAEditar->id_noticia),
-        [
-            'id_categoria' => $categoria->id_categoria,
-            'titulo' => 'Título nuevo',
-            'contenido' => 'Contenido nuevo',
-            'autor' => 'Redacción',
-            'status' => 'publicado',
-            'es_principal' => true,
-        ]
-    ))->toThrow(RuntimeException::class);
+    try {
+        expect(fn () => $this->actingAs($admin)->put(
+            route('admin.noticias.update', $noticiaAEditar->id_noticia),
+            [
+                'id_categoria' => $categoria->id_categoria,
+                'titulo' => 'Título nuevo',
+                'contenido' => 'Contenido nuevo',
+                'autor' => 'Redacción',
+                'status' => 'publicado',
+                'es_principal' => true,
+            ]
+        ))->toThrow(RuntimeException::class);
+    } finally {
+        // Quitamos el listener para no contaminar las demás pruebas.
+        Noticia::getEventDispatcher()
+            ->forget('eloquent.updating: '.Noticia::class);
+    }
 
     expect($noticiaPrincipal->refresh()->es_principal)->toBeTrue();
 });
