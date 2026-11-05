@@ -8,7 +8,7 @@ Resumen del proyecto: **qué hace**, **cómo está montado** y **cómo fluye la 
 
 **UMC News** es el **periódico digital de la Universidad Marítima del Caribe**. Es una *web app* hecha en **Laravel 12** donde:
 
-- La **redacción (admin/editores)** publica noticias con fotos, categorías y estado (borrador o publicado).
+- La **redacción (admin/lectores)** publica noticias con fotos, categorías y estado (borrador o publicado).
 - Los **lectores** navegan la portada, leen noticias por categoría, comentan y se suscriben al feed RSS.
 - Hay un **rincón secreto** ("Soplar al Viento") donde los estudiantes pueden dejar confesiones y rumores **anónimos**, desbloqueable con un acertijo diario.
 
