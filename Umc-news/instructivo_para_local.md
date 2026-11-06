@@ -6,7 +6,7 @@ Periódico oficial de la Universidad Marítima del Caribe, construido con Larave
 
 - PHP 8.2 o superior con las extensiones habituales de Laravel (`pdo`, `mbstring`, `openssl`, `fileinfo`, `gd`).
 - Composer 2.
-- SQLite para desarrollo rápido, o MySQL/MariaDB para producción.
+- SQLite para desarrollo rápido, o MySQL/MariaDB para producción.(recomendable usar mysql)-(el usuario predeterminado admi es: admin@umcnews.com)
 - No requiere Node.js ni Vite: los estilos y scripts se sirven directamente desde `public/`.
 
 ## Instalación local
